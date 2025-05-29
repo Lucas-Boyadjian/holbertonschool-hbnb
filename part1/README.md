@@ -8,12 +8,12 @@ This project contains all diagram for HBnB project
 
 ## Detailed Class Diagram for Business Logic Layer
 
-In this diagram we have 5 class : User, Place, Review, Place_amenity and Amenity.
+In this diagram we have 5 class : `User`, `Place`, `Review`, `Place_amenity` and `Amenity`.
 
-The User class can create a Place.
+The `User` class can create a `Place`.
 
-Place can have Review and Amenity.
+`Place` can have `Review` and `Amenity`.
 
-Place can't exist Userless, Review can't exist Placeless and Amenity can't exist Placeless too.
+`Place` can't exist `Userless`, `Review` can't exist `Placeless` and `Amenity` can't exist `Placeless` too.
 
 ![ClassDiagram for HBnB](/part1/Image/Class%20Diagram.png)
