@@ -16,4 +16,4 @@ Place can have Review and Amenity.
 
 Place can't exist Userless, Review can't exist Placeless and Amenity can't exist Placeless too.
 
-[![ClassDiagram for HBnB](/part1/Image/Class%20Diagram.png)]
+![ClassDiagram for HBnB](/part1/Image/Class%20Diagram.png)
