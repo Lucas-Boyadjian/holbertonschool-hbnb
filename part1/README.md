@@ -19,7 +19,35 @@ The HBnB application follows a layered architecture pattern with clear separatio
 - **Data Access Layer**: Database operations and persistence
 
 ## High-Level Package Diagram
-*[Your package diagram will go here]*
+```mermaid
+classDiagram
+direction TB
+    class PresentationLayer {
+	    +UserController
+	    +PlaceController
+	    +ReviewController
+	    +AmenityController
+    }
+
+    class BusinessLogicLayer {
+	    +UserClass
+	    +PlaceClass
+	    +ReviewClass
+	    +AmenityClass
+    }
+
+    class PersistenceLayer {
+	    +UserData
+	    +PlaceData
+	    +ReviewData
+	    +AmenityData
+    }
+
+    PresentationLayer --> BusinessLogicLayer : Facade Pattern
+    BusinessLogicLayer --> PersistenceLayer : DataBase operations
+    PresentationLayer <.. BusinessLogicLayer
+    BusinessLogicLayer <.. PersistenceLayer
+```
 
 ## Business Logic Layer
 
