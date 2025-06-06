@@ -214,7 +214,7 @@ direction LR
 - **Prefixes**: "Model" prefix for all entity classes
 - **Methods**: CRUD operations follow consistent naming patterns
 
-### Sequence Diagrams for API Calls
+## Sequence Diagrams for API Calls
 
 ### User Registration
 ```mermaid
@@ -222,57 +222,58 @@ direction LR
 config:
   theme: redux-dark-color
 ---
-sequenceDiagram
-  participant Interface as Interface (User)
-  participant API as API (Presentation Layer)
-  participant UserModel as UserModel (Business Logic Layer)
-  participant UserRepository as UserRepository (Persistence Layer)
-  participant Database as Database
-  Interface ->>+ API: (1) POST /UserRegistration (JSON: e-mail, password)
-  API ->>+ UserModel: (2) Validate user fields
-  alt VALIDATION FAILED
-    UserModel -->> API: (3) Error: invalid fields
-    API -->> Interface: (4) 400 Bad Request (invalid fields)
-  else VALIDATION SUCCESS
-    UserModel -->> API: (5) Success: valid fields
-    API ->> UserModel: (6) Request to create user (e-mail, password)
-    UserModel ->>+ UserRepository: (7) Request a uniqueness check (e-mail)
-    UserRepository ->>+ Database: (8) Search user by e-mail
-    alt E-MAIL EXIST
-      Database -->> UserRepository: (9) E-mail associated with a user
-      UserRepository -->> UserModel: (10) Error: duplicate found
-      UserModel -->> API: (11) Error: E-mail is already taken
-      API -->> Interface: (12) 409 Conflict (e-mail already exist)
-    else E-MAIL UNIQUE
-      Database -->> UserRepository: (13) E-mail not found
-      UserRepository -->> UserModel: (14) Success: e-mail is unique
-      UserModel ->> UserModel: (15) Hash password
-      UserModel ->> UserRepository: (16) Request to save user data (e-mail, hashed password)
-      UserRepository ->> Database: (17) Insert user (as JSON)
-      Database -->>- UserRepository: (18) Return: new user ID
-      UserRepository -->>- UserModel: (19) Success: user data saved
-      UserModel -->>- API: (20) User object creation (ID, e-mail)
-      API -->>- Interface: (21) 201 Created (JSON: ID, e-mail)
+	sequenceDiagram
+    participant Interface as Interface (User)
+    participant API as API (Presentation Layer)
+    participant UserModel as UserModel (Business Logic Layer)
+    participant UserRepository as UserRepository (Persistence Layer)
+    participant Database as Database
+    
+    Interface ->>+ API: (1) POST /UserRegistration (JSON: e-mail, password)
+    API ->>+ UserModel: (2) Validate user fields
+    alt VALIDATION FAILED
+        UserModel -->> API: (3) Error: invalid fields
+        API -->> Interface: (4) 400 Bad Request (invalid fields)
+    else VALIDATION SUCCESS
+        UserModel -->> API: (5) Success: valid fields
+        API ->> UserModel: (6) Request to create user (e-mail, password)
+        UserModel ->>+ UserRepository: (7) Request a uniqueness check (e-mail)
+        UserRepository ->>+ Database: (8) Search user by e-mail
+        alt E-MAIL EXIST
+            Database -->> UserRepository: (9) E-mail associated with a user
+            UserRepository -->> UserModel: (10) Error: duplicate found
+            UserModel -->> API: (11) Error: E-mail is already taken
+            API -->> Interface: (12) 409 Conflict (e-mail already exist)
+        else E-MAIL UNIQUE
+            Database -->> UserRepository: (13) E-mail not found
+            UserRepository -->> UserModel: (14) Success: e-mail is unique
+            UserModel ->> UserModel: (15) Hash password
+            UserModel ->> UserRepository: (16) Request to save user data (e-mail, hashed password)
+            UserRepository ->> Database: (17) Insert user (as JSON)
+            Database -->>- UserRepository: (18) Return: new user ID
+            UserRepository -->>- UserModel: (19) Success: user data saved
+            UserModel -->>- API: (20) User object creation (ID, e-mail)
+            API -->>- Interface: (21) 201 Created (JSON: ID, e-mail)
+        end
     end
-  end
 ```
-This sequence diagram illustrates how a new user registers in the HBnB system:
+Ce diagramme de séquence illustre les étapes du processus d'inscription :
 
-1. **Request Submission**: User provides email and password credentials
-2. **Input Validation**: System verifies that all required fields are properly formatted
-3. **Duplicate Prevention**: System checks whether the email is already registered
-4. **Secure Storage**: For new users, password is hashed before storage
-5. **User Creation**: Valid user data is persisted in the database 
-6. **Confirmation**: System responds with the new user's unique ID
+1. **Soumission de la demande** : L'utilisateur fournit son email et mot de passe
+2. **Validation des données** : Le système vérifie la conformité des informations saisies
+3. **Vérification d'unicité** : Le système s'assure que l'email n'est pas déjà utilisé
+4. **Sécurisation** : En cas d'email unique, le mot de passe est haché avant stockage
+5. **Persistance** : Les données utilisateur sont enregistrées dans la base de données
+6. **Confirmation** : Le système répond avec l'ID et l'email du nouvel utilisateur
 
-Key aspects of this flow:
-- Data validation happens before database operations
-- Email uniqueness is enforced to prevent duplicate accounts
-- Password security is maintained through hashing
-- Only non-sensitive data is returned in the response (ID and email)
-- Clear HTTP status codes indicate success (201) or specific failure reasons (400, 409)
+Points clés de ce processus :
+- Validation préalable des données avant toute opération sur la base de données
+- Vérification de l'unicité de l'email pour éviter les doublons
+- Protection des mots de passe par hachage
+- Retour uniquement des données non sensibles dans la réponse (ID et email)
+- Codes HTTP clairs indiquant le succès (201) ou les raisons d'échec (400, 409)
 
-This flow implements the principle of defense in depth, with multiple validation steps before creating a new user account.
+Ce flux implémente plusieurs couches de protection pour garantir l'intégrité des données utilisateur.
 
 ### Place Creation
 ```mermaid
@@ -280,41 +281,41 @@ This flow implements the principle of defense in depth, with multiple validation
 config:
   theme: redux-dark-color
 ---
-sequenceDiagram
-  participant Interface as Interface (User)
-  participant API as API (Presentation Layer)
-  participant AuthService as AuthService (Business Logic Layer)
-  participant PlaceModel as PlaceModel (Business Logic Layer)
-  participant PlaceRepository as PlaceRepository (Persistence Layer)
-  participant Database as Database
-
-  Interface ->>+ API: (1) POST /PlaceCreation (JSON: title, description, price, latitude, longitude)
-  API ->>+ AuthService: (2) Validate token
-  AuthService ->>+ Database: (3) Check token and get user
-
-  alt INVALID TOKEN
-    Database -->> AuthService: (4) Error: invalid token
-    AuthService -->> API: (5) Return unauthorized
-    API -->> Interface: (6) 401 Unauthorized (invalid token)
-  else VALID TOKEN
-    Database -->> AuthService: (7) Success: return UserID
-    AuthService -->>- API: (8) Return authenticated (UserID)
-    API ->>+ PlaceModel: (9) Validate place fields
-
-    alt VALIDATION FAILED
-      PlaceModel -->> API: (10) Error: invalid fields 
-      API -->> Interface: (11) 400 Bad Request (invalid fields)
-    else VALIDATION SUCCESS
-      PlaceModel -->> API: (12) Success: valid fields
-      API ->> PlaceModel: (13) Create place
-      PlaceModel ->>+ PlaceRepository: (14) Save place
-      PlaceRepository ->> Database: (15) Insert place (associated to the User)
-      Database -->>- PlaceRepository: (16) Return place ID
-      PlaceRepository -->>- PlaceModel: (17) Place saved
-      PlaceModel -->>- API: (18) Return created place object
-      API -->>- Interface: (19) 201 Created (JSON: title, description, price, latitude, longitude, userId, placeId)
+	sequenceDiagram
+    participant Interface as Interface (User)
+    participant API as API (Presentation Layer)
+    participant AuthService as AuthService (Business Logic Layer)
+    participant PlaceModel as PlaceModel (Business Logic Layer)
+    participant PlaceRepository as PlaceRepository (Persistence Layer)
+    participant Database as Database
+    
+    Interface ->>+ API: (1) POST /PlaceCreation (JSON: title, description, price, latitude, longitude)
+    API ->>+ AuthService: (2) Validate token
+    AuthService ->>+ Database: (3) Check token and get user
+    
+    alt INVALID TOKEN
+        Database -->> AuthService: (4) Error: invalid token
+        AuthService -->> API: (5) Return unauthorized
+        API -->> Interface: (6) 401 Unauthorized (invalid token)
+    else VALID TOKEN
+        Database -->> AuthService: (7) Success: return UserID
+        AuthService -->>- API: (8) Return authenticated (UserID)
+        API ->>+ PlaceModel: (9) Validate place fields
+        
+        alt VALIDATION FAILED
+            PlaceModel -->> API: (10) Error: invalid fields 
+            API -->> Interface: (11) 400 Bad Request (invalid fields)
+        else VALIDATION SUCCESS
+            PlaceModel -->> API: (12) Success: valid fields
+            API ->> PlaceModel: (13) Create place
+            PlaceModel ->>+ PlaceRepository: (14) Save place
+            PlaceRepository ->> Database: (15) Insert place (associated to the User)
+            Database -->>- PlaceRepository: (16) Return place ID
+            PlaceRepository -->>- PlaceModel: (17) Place saved
+            PlaceModel -->>- API: (18) Return created place object
+            API -->>- Interface: (19) 201 Created (JSON: title, description, price, latitude, longitude, userId, placeId)
+        end
     end
-  end
 ```
 This sequence diagram illustrates how an authenticated user creates a new place listing:
 
@@ -339,41 +340,41 @@ This flow enforces the "Authentication Required" business rule by ensuring only 
 config:
   theme: redux-dark-color
 ---
-sequenceDiagram
-  participant Interface as Interface (User)
-  participant API as API (Presentation Layer)
-  participant AuthService as AuthService (Business Logic Layer)
-  participant ReviewModel as ReviewModel (Business Logic Layer)
-  participant ReviewRepository as ReviewRepository (Persistence Layer)
-  participant Database as Database
-
-  Interface ->>+ API: (1) POST /ReviewSubmission (JSON: PlaceID, rating, comment)
-  API ->>+ AuthService: (2) Validate token
-  AuthService ->>+ Database: (3) Check token and get user
-
-  alt INVALID TOKEN
-    Database -->> AuthService: (4) Error: invalid token
-    AuthService -->> API: (5) Return unauthorized
-    API -->> Interface: (6) 401 Unauthorized (invalid token)
-  else VALID TOKEN
-    Database -->> AuthService: (7) Success: return UserID
-    AuthService -->>- API: (8) Return authenticated (UserID)
-    API ->>+ ReviewModel: (9) Validate review fields
-
-    alt VALIDATION FAILED
-      ReviewModel -->> API: (10) Error: invalid fields
-      API -->> Interface: (11) 400 Bad Request (invalid fields)
-    else VALIDATION SUCCESS
-      ReviewModel -->> API: (12) Success: valid fields
-      API ->> ReviewModel: (13) Create review
-      ReviewModel ->>+ ReviewRepository: (14) Save review
-      ReviewRepository ->> Database: (15) Insert review (associated to the Place)
-      Database -->>- ReviewRepository: (16) Return review ID
-      ReviewRepository -->>- ReviewModel: (17) Review saved
-      ReviewModel -->>- API: (18) Return created review object
-      API -->>- Interface: (19) 201 Created (JSON: PlaceID, rating, comment, UserID, ReviewID)
+	sequenceDiagram
+    participant Interface as Interface (User)
+    participant API as API (Presentation Layer)
+    participant AuthService as AuthService (Business Logic Layer)
+    participant ReviewModel as ReviewModel (Business Logic Layer)
+    participant ReviewRepository as ReviewRepository (Persistence Layer)
+    participant Database as Database
+    
+    Interface ->>+ API: (1) POST /ReviewSubmission (JSON: PlaceID, rating, comment)
+    API ->>+ AuthService: (2) Validate token
+    AuthService ->>+ Database: (3) Check token and get user
+    
+    alt INVALID TOKEN
+        Database -->> AuthService: (4) Error: invalid token
+        AuthService -->> API: (5) Return unauthorized
+        API -->> Interface: (6) 401 Unauthorized (invalid token)
+    else VALID TOKEN
+        Database -->> AuthService: (7) Success: return UserID
+        AuthService -->>- API: (8) Return authenticated (UserID)
+        API ->>+ ReviewModel: (9) Validate review fields
+        
+        alt VALIDATION FAILED
+            ReviewModel -->> API: (10) Error: invalid fields
+            API -->> Interface: (11) 400 Bad Request (invalid fields)
+        else VALIDATION SUCCESS
+            ReviewModel -->> API: (12) Success: valid fields
+            API ->> ReviewModel: (13) Create review
+            ReviewModel ->>+ ReviewRepository: (14) Save review
+            ReviewRepository ->> Database: (15) Insert review (associated to the Place)
+            Database -->>- ReviewRepository: (16) Return review ID
+            ReviewRepository -->>- ReviewModel: (17) Review saved
+            ReviewModel -->>- API: (18) Return created review object
+            API -->>- Interface: (19) 201 Created (JSON: PlaceID, rating, comment, UserID, ReviewID)
+        end
     end
-  end
 ```
 This sequence diagram illustrates how an authenticated user submits a review for a place:
 
@@ -398,42 +399,42 @@ This flow enforces both the "Authentication Required" business rule and establis
 config:
   theme: redux-dark-color
 ---
-sequenceDiagram
-  participant Interface as Interface (User)
-  participant API as API (Presentation Layer)
-  participant AuthService as AuthService (Business Logic Layer)
-  participant PlaceQueryModel as PlaceQueryModel (Business Logic Layer)
-  participant PlaceRepository as PlaceRepository (Persistence Layer)
-  participant Database as Database
-
-  Interface ->>+ API: GET /FetchingListOfPlaces (filters)
-  API ->>+ AuthService: Validate token
-  AuthService ->>+ Database: Check token and get user
-  alt INVALID TOKEN
-    Database -->> AuthService: Error: invalid token
-    AuthService -->> API: Error: unauthorized
-    API -->> Interface: 401 unauthorized (invalid token)
-  else VALID TOKEN
-    Database -->> AuthService: Success: return UserID
-    AuthService -->>- API: Return authenticated (UserID)
-    API ->>+ PlaceQueryModel: Validate parameters
-    alt VALIDATION FAILED
-      PlaceQueryModel -->> API: Error: invalid parameters
-      API -->> Interface: 400 Bad Request (invalid filters)
-    else VALIDATION SUCCESS
-      PlaceQueryModel -->> API: Valid parameters
-      API ->> PlaceQueryModel: Fetch places matching filters
-      PlaceQueryModel ->>+ PlaceRepository: Search places
-      PlaceRepository ->> Database: Query places with filters
-      Database -->>- PlaceRepository: Return matching places
-      PlaceRepository -->>- PlaceQueryModel: Create list of matched places 
-      PlaceQueryModel -->>- API: Return list of places
-      API -->>- Interface: 200 list sorted (JSON: list of places)
+	sequenceDiagram
+    participant Interface as Interface (User)
+    participant API as API (Presentation Layer)
+    participant AuthService as AuthService (Business Logic Layer)
+    participant PlaceQueryModel as PlaceQueryModel (Business Logic Layer)
+    participant PlaceRepository as PlaceRepository (Persistence Layer)
+    participant Database as Database
+    
+    Interface ->>+ API: GET /FetchingListOfPlaces (filters)
+    API ->>+ AuthService: Validate token
+    AuthService ->>+ Database: Check token and get user
+    
+    alt INVALID TOKEN
+        Database -->> AuthService: Error: invalid token
+        AuthService -->> API: Error: unauthorized
+        API -->> Interface: 401 unauthorized (invalid token)
+    else VALID TOKEN
+        Database -->> AuthService: Success: return UserID
+        AuthService -->>- API: Return authenticated (UserID)
+        API ->>+ PlaceQueryModel: Validate parameters
+        
+        alt VALIDATION FAILED
+            PlaceQueryModel -->> API: Error: invalid parameters
+            API -->> Interface: 400 Bad Request (invalid filters)
+        else VALIDATION SUCCESS
+            PlaceQueryModel -->> API: Valid parameters
+            API ->> PlaceQueryModel: Fetch places matching filters
+            PlaceQueryModel ->>+ PlaceRepository: Search places
+            PlaceRepository ->> Database: Query places with filters
+            Database -->>- PlaceRepository: Return matching places
+            PlaceRepository -->>- PlaceQueryModel: Create list of matched places 
+            PlaceQueryModel -->>- API: Return list of places
+            API -->>- Interface: 200 list sorted (JSON: list of places)
+        end
     end
-  end
 ```
-
-### Place Listing Flow
 
 This sequence diagram illustrates how an authenticated user fetches a filtered list of places:
 
