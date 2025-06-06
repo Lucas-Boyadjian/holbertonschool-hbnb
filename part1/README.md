@@ -221,6 +221,7 @@ direction LR
 ---
 config:
   theme: redux-dark-color
+  look: neo
 ---
 	sequenceDiagram
     participant Interface as Interface (User)
@@ -280,6 +281,7 @@ Ce flux implémente plusieurs couches de protection pour garantir l'intégrité 
 ---
 config:
   theme: redux-dark-color
+  look: neo
 ---
 	sequenceDiagram
     participant Interface as Interface (User)
@@ -339,6 +341,7 @@ This flow enforces the "Authentication Required" business rule by ensuring only 
 ---
 config:
   theme: redux-dark-color
+  look: neo
 ---
 	sequenceDiagram
     participant Interface as Interface (User)
@@ -398,6 +401,7 @@ This flow enforces both the "Authentication Required" business rule and establis
 ---
 config:
   theme: redux-dark-color
+  look: neo
 ---
 	sequenceDiagram
     participant Interface as Interface (User)
