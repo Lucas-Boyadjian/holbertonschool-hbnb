@@ -403,11 +403,6 @@ config:
   theme: redux-dark-color
   look: neo
 ---
-	---
-config:
-  theme: redux-dark-color
-  look: neo
----
 sequenceDiagram
     participant Interface as Interface (User)
     participant API as API (Presentation Layer)
