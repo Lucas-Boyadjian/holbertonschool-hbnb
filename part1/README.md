@@ -258,23 +258,23 @@ config:
         end
     end
 ```
-Ce diagramme de séquence illustre les étapes du processus d'inscription :
+This sequence diagram illustrates the steps of the user registration process:
 
-1. **Soumission de la demande** : L'utilisateur fournit son email et mot de passe
-2. **Validation des données** : Le système vérifie la conformité des informations saisies
-3. **Vérification d'unicité** : Le système s'assure que l'email n'est pas déjà utilisé
-4. **Sécurisation** : En cas d'email unique, le mot de passe est haché avant stockage
-5. **Persistance** : Les données utilisateur sont enregistrées dans la base de données
-6. **Confirmation** : Le système répond avec l'ID et l'email du nouvel utilisateur
+1. **Request Submission**: The user provides their email and password
+2. **Data Validation**: The system verifies the compliance of the information entered
+3. **Uniqueness Verification**: The system ensures the email isn't already in use
+4. **Security**: For unique emails, the password is hashed before storage
+5. **Persistence**: The user data is saved in the database
+6. **Confirmation**: The system responds with the ID and email of the new user
 
-Points clés de ce processus :
-- Validation préalable des données avant toute opération sur la base de données
-- Vérification de l'unicité de l'email pour éviter les doublons
-- Protection des mots de passe par hachage
-- Retour uniquement des données non sensibles dans la réponse (ID et email)
-- Codes HTTP clairs indiquant le succès (201) ou les raisons d'échec (400, 409)
+Key aspects of this process:
+- Preliminary validation of data before any database operation
+- Verification of email uniqueness to avoid duplicates
+- Password protection through hashing
+- Return of only non-sensitive data in the response (ID and email)
+- Clear HTTP codes indicating success (201) or reasons for failure (400, 409)
 
-Ce flux implémente plusieurs couches de protection pour garantir l'intégrité des données utilisateur.
+This flow implements multiple layers of protection to ensure user data integrity.
 
 ### Place Creation
 ```mermaid
@@ -403,7 +403,12 @@ config:
   theme: redux-dark-color
   look: neo
 ---
-	sequenceDiagram
+	---
+config:
+  theme: redux-dark-color
+  look: neo
+---
+sequenceDiagram
     participant Interface as Interface (User)
     participant API as API (Presentation Layer)
     participant AuthService as AuthService (Business Logic Layer)
@@ -411,31 +416,31 @@ config:
     participant PlaceRepository as PlaceRepository (Persistence Layer)
     participant Database as Database
     
-    Interface ->>+ API: GET /FetchingListOfPlaces (filters)
-    API ->>+ AuthService: Validate token
-    AuthService ->>+ Database: Check token and get user
+    Interface ->>+ API: (1) GET /FetchingListOfPlaces (filters)
+    API ->>+ AuthService: (2) Validate token
+    AuthService ->>+ Database: (3) Check token and get user
     
     alt INVALID TOKEN
-        Database -->> AuthService: Error: invalid token
-        AuthService -->> API: Error: unauthorized
-        API -->> Interface: 401 unauthorized (invalid token)
+        Database -->> AuthService: (4) Error: invalid token
+        AuthService -->> API: (5) Error: unauthorized
+        API -->> Interface: (6) 401 unauthorized (invalid token)
     else VALID TOKEN
-        Database -->> AuthService: Success: return UserID
-        AuthService -->>- API: Return authenticated (UserID)
-        API ->>+ PlaceQueryModel: Validate parameters
+        Database -->> AuthService: (7) Success: return UserID
+        AuthService -->>- API: (8) Return authenticated (UserID)
+        API ->>+ PlaceQueryModel: (9) Validate parameters
         
         alt VALIDATION FAILED
-            PlaceQueryModel -->> API: Error: invalid parameters
-            API -->> Interface: 400 Bad Request (invalid filters)
+            PlaceQueryModel -->> API: (10) Error: invalid parameters
+            API -->> Interface: (11) 400 Bad Request (invalid filters)
         else VALIDATION SUCCESS
-            PlaceQueryModel -->> API: Valid parameters
-            API ->> PlaceQueryModel: Fetch places matching filters
-            PlaceQueryModel ->>+ PlaceRepository: Search places
-            PlaceRepository ->> Database: Query places with filters
-            Database -->>- PlaceRepository: Return matching places
-            PlaceRepository -->>- PlaceQueryModel: Create list of matched places 
-            PlaceQueryModel -->>- API: Return list of places
-            API -->>- Interface: 200 list sorted (JSON: list of places)
+            PlaceQueryModel -->> API: (12) Valid parameters
+            API ->> PlaceQueryModel: (13) Fetch places matching filters
+            PlaceQueryModel ->>+ PlaceRepository: (14) Search places
+            PlaceRepository ->> Database: (15) Query places with filters
+            Database -->>- PlaceRepository: (16) Return matching places
+            PlaceRepository -->>- PlaceQueryModel: (17) Create list of matched places 
+            PlaceQueryModel -->>- API: (18) Return list of places
+            API -->>- Interface: (19) 200 list sorted (JSON: list of places)
         end
     end
 ```
