@@ -1,4 +1,6 @@
-from basemodel import BaseModel
+#!/usr/bin/env python3
+
+from .basemodel import BaseModel
 
 class Place(BaseModel):
     def __init__(self, title, description, price, latitude, longitude, owner):
