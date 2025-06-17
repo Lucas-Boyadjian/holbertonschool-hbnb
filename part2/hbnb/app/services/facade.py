@@ -55,6 +55,7 @@ class HBnBFacade:
             new_place.add_amenity(amenity)
 
         self.place_repo.add(new_place)
+        owner.add_place(new_place)
         return new_place
 
     def get_place(self, place_id):
@@ -67,10 +68,24 @@ class HBnBFacade:
         return self.place_repo.get_all()
 
     def update_place(self, place_id, place_data):
+        """Update a place with the given data"""
         place = self.get_place(place_id)
-        for key, value in place_data.items():
-            if hasattr(place, key):
-                setattr(place, key, value)
-            else:
-                raise AttributeError(f"Invalid attribute: {key}")
+        if not place:
+            raise ValueError(f"Place with id {place_id} does not exist.")
+        
+        updatable_attrs = ['title', 'description', 'price', 'latitude', 'longitude']
+        for attr in updatable_attrs:
+            if attr in place_data and place_data[attr] is not None:
+                setattr(place, attr, place_data[attr])
+        
+        if 'amenity_ids' in place_data:
+            place.amenities = []
+            place.amenity_ids = []
+            
+            for amenity_id in place_data['amenity_ids']:
+                amenity = self.amenity_repo.get(amenity_id)
+                if amenity is None:
+                    raise ValueError(f"Amenity with id {amenity_id} does not exist.")
+                place.add_amenity(amenity)
+        
         return place
