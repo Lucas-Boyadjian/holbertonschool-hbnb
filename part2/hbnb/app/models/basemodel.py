@@ -2,6 +2,8 @@
 
 import uuid
 from datetime import datetime
+from flask import Flask
+
 
 class BaseModel:
     def __init__(self):
