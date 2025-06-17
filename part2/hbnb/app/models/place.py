@@ -26,6 +26,18 @@ class Place(BaseModel):
         self.amenities.append(amenity)
 
     @property
+    def title(self):
+        return self._title
+
+    @title.setter
+    def title(self, value):
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("Title cannot be None.")
+        if len(value) > 100:
+            raise ValueError("Title must be 100 characters max.")
+        self._title = value
+
+    @property
     def price(self):
         return self._price
     
