@@ -2,6 +2,7 @@
 
 from app.persistence.repository import InMemoryRepository
 from app.models.place import Place
+from app.models.user import User
 import uuid
 
 class HBnBFacade:
