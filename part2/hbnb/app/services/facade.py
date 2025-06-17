@@ -2,6 +2,7 @@
 
 from app.persistence.repository import InMemoryRepository
 from app.models.place import Place
+from app.models.user import User
 import uuid
 
 class HBnBFacade:
@@ -23,10 +24,8 @@ class HBnBFacade:
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
 
-    # Placeholder method for fetching a place by ID
-    def get_place(self, place_id):
-        # Logic will be implemented in later tasks
-        pass
+    def get_all_user(self):
+        return self.user_repo.get_all()
    
     def create_place(self, place_data):
         required_fields = ['title', 'price', 'latitude', 'longitude', 'user_id']
