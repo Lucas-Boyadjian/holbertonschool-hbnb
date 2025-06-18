@@ -7,4 +7,9 @@ class Amenity(BaseModel):
         super().__init__()
         if not name or len(name) > 50:
             raise ValueError("Invalid name")
+<<<<<<< HEAD
         self.name = name
+=======
+        self.name = name
+
+>>>>>>> origin/main
