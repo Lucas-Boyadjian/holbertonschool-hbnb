@@ -3,6 +3,10 @@
 from app.persistence.repository import InMemoryRepository
 from app.models.place import Place
 from app.models.user import User
+<<<<<<< HEAD
+=======
+from app.models.amenity import Amenity
+>>>>>>> origin/dev2
 import uuid
 
 class HBnBFacade:
@@ -23,52 +27,77 @@ class HBnBFacade:
     
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
+<<<<<<< HEAD
 
     def get_all_user(self):
         return self.user_repo.get_all()
     
     def put_user(self, user_id, data):
         return self.user_repo.update(user_id, data)
+=======
+>>>>>>> origin/dev2
    
+    def get_all_user(self):
+        return self.user_repo.get_all()
+
     def create_place(self, place_data):
-        required_fields = ['title', 'price', 'latitude', 'longitude', 'user_id']
+        required_fields = ['title', 'price', 'latitude', 'longitude', 'owner_id']
         for field in required_fields:
             if field not in place_data:
-                raise ValueError("Missing required field: {}".format(field))
+                raise ValueError(f"Missing required field: {field}")
 
-        user = self.get_user_by_id(place_data["user_id"])
-        if user is None:
-            raise ValueError("Invalid user_id: user does not exist.")
-            
-        new_place = Place(id=str(uuid.uuid4()),
+        owner = self.get_user(place_data["owner_id"])
+        if owner is None:
+            raise ValueError("Invalid owner_id: owner does not exist.")
+        
+        new_place = Place(
             title=place_data["title"],
             description=place_data.get("description", ""),
             price=place_data["price"],
             latitude=place_data["latitude"],
             longitude=place_data["longitude"],
-            owner=user)
+            owner=owner
+        )
 
-        self.places[new_place.id] = new_place
+        amenity_ids = place_data.get('amenity_ids', [])
+        for amenity_id in amenity_ids:
+            amenity = self.amenity_repo.get(amenity_id)
+            if amenity is None:
+                raise ValueError(f"Amenity with id {amenity_id} does not exist.")
+            new_place.add_amenity(amenity)
+
+        self.place_repo.add(new_place)
+        owner.add_place(new_place)
         return new_place
 
     def get_place(self, place_id):
-    # Placeholder for logic to retrieve a place by ID, including associated owner and amenities
-        place = self.places.get(place_id)
-        if not place:
-            raise Exception("Place not found.")
+        place = self.place_repo.get(place_id)
+        if place is None:
+            raise KeyError("Place not found.")
         return place
 
     def get_all_places(self):
-    # Placeholder for logic to retrieve all places
-        return list(self.places.values())
+        return self.place_repo.get_all()
 
     def update_place(self, place_id, place_data):
-    # Placeholder for logic to update a place
+        """Update a place with the given data"""
         place = self.get_place(place_id)
-        for key, value in place_data.items():
-            if hasattr(place, key):
-                setattr(place, key, value)
-            else:
-                raise Exception("Invalid attribute: {}".format(key))
+        if not place:
+            raise ValueError(f"Place with id {place_id} does not exist.")
+        
+        updatable_attrs = ['title', 'description', 'price', 'latitude', 'longitude']
+        for attr in updatable_attrs:
+            if attr in place_data and place_data[attr] is not None:
+                setattr(place, attr, place_data[attr])
+        
+        if 'amenity_ids' in place_data:
+            place.amenities = []
+            place.amenity_ids = []
+            
+            for amenity_id in place_data['amenity_ids']:
+                amenity = self.amenity_repo.get(amenity_id)
+                if amenity is None:
+                    raise ValueError(f"Amenity with id {amenity_id} does not exist.")
+                place.add_amenity(amenity)
+        
         return place
-    

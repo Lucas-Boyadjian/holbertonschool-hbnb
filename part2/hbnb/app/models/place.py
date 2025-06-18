@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from flask import Flask
 from .basemodel import BaseModel
 
 class Place(BaseModel):
@@ -25,6 +24,18 @@ class Place(BaseModel):
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
         self.amenities.append(amenity)
+
+    @property
+    def title(self):
+        return self._title
+
+    @title.setter
+    def title(self, value):
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("Title cannot be None.")
+        if len(value) > 100:
+            raise ValueError("Title must be 100 characters max.")
+        self._title = value
 
     @property
     def price(self):
