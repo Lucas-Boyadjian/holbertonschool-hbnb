@@ -3,10 +3,7 @@
 from app.persistence.repository import InMemoryRepository
 from app.models.place import Place
 from app.models.user import User
-<<<<<<< HEAD
-=======
 from app.models.amenity import Amenity
->>>>>>> origin/dev2
 import uuid
 
 class HBnBFacade:
@@ -27,15 +24,12 @@ class HBnBFacade:
     
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
-<<<<<<< HEAD
 
     def get_all_user(self):
         return self.user_repo.get_all()
     
     def put_user(self, user_id, data):
         return self.user_repo.update(user_id, data)
-=======
->>>>>>> origin/dev2
    
     def get_all_user(self):
         return self.user_repo.get_all()
