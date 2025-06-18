@@ -104,9 +104,18 @@ class PlaceResource(Resource):
                 'first_name': owner.first_name,
                 'last_name': owner.last_name,
                 'email': owner.email
+            } 
+                     
+            response = {
+                'id': place.id,
+                'title': place.title,
+                'description': place.description,
+                'price': place.price,
+                'latitude': place.latitude,
+                'longitude': place.longitude,
+                'owner': owner_data,
             }
             
-            # Récupérer les amenities
             amenities_data = [
                 {
                     'id': amenity.id,
@@ -115,17 +124,11 @@ class PlaceResource(Resource):
                 for amenity in place.amenities
             ]
             
-            return {
-                'id': place.id,
-                'title': place.title,
-                'description': place.description,
-                'price': place.price,
-                'latitude': place.latitude,
-                'longitude': place.longitude,
-                'owner': owner_data,
-                'amenities': amenities_data
-            }, 200
+            if amenities_data:
+                response['amenities'] = amenities_data
             
+            return response, 200
+        
         except Exception as e:
             return {'error': f"An unexpected error occurred: {str(e)}"}, 500
 
