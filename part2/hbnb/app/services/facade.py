@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
 
 from app.persistence.repository import InMemoryRepository
-<<<<<<< HEAD
-from app.models.amenity import Amenity
-=======
 from app.models.place import Place
 from app.models.user import User
 from app.models.amenity import Amenity
 import uuid
 
->>>>>>> origin/main
 class HBnBFacade:
     def __init__(self):
         self.user_repo = InMemoryRepository()
@@ -38,6 +34,27 @@ class HBnBFacade:
     def get_all_user(self):
         return self.user_repo.get_all()
 
+    def create_amenity(self, amenity_data):
+        name = amenity_data.get("name")
+        new_amenity = Amenity(name)
+        self.amenity_repo.add(new_amenity)
+        return new_amenity
+
+    def get_amenity(self, amenity_id):
+        new_amenity = self.amenity_repo.get(amenity_id)
+        return new_amenity
+
+    def get_all_amenities(self):
+        return self.amenity_repo.get_all()
+
+    def update_amenity(self, amenity_id, amenity_data):
+        amenity = self.amenity_repo.get(amenity_id)
+        if amenity is None:
+            return None
+        amenity.update(amenity_data)
+        return amenity
+
+    
     def create_place(self, place_data):
         required_fields = ['title', 'price', 'latitude', 'longitude', 'owner_id']
         for field in required_fields:
@@ -72,26 +89,6 @@ class HBnBFacade:
         return new_place
 
     def get_place(self, place_id):
-<<<<<<< HEAD
-        # Logic will be implemented in later tasks
-        pass
-
-    def create_amenity(self, amenity_data):
-        # Placeholder for logic to create an amenity
-        pass
-
-    def get_amenity(self, amenity_id):
-        # Placeholder for logic to retrieve an amenity by ID
-        pass
-
-    def get_all_amenities(self):
-        # Placeholder for logic to retrieve all amenities
-        pass
-
-    def update_amenity(self, amenity_id, amenity_data):
-        # Placeholder for logic to update an amenity
-        pass
-=======
         place = self.place_repo.get(place_id)
         if place is None:
             raise KeyError("Place not found.")
@@ -122,4 +119,3 @@ class HBnBFacade:
                 place.add_amenity(amenity)
         
         return place
->>>>>>> origin/main
