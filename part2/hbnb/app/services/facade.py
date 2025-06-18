@@ -53,12 +53,15 @@ class HBnBFacade:
             owner=owner
         )
 
-        amenity_ids = place_data.get('amenity_ids', [])
-        for amenity_id in amenity_ids:
-            amenity = self.amenity_repo.get(amenity_id)
-            if amenity is None:
-                raise ValueError(f"Amenity with id {amenity_id} does not exist.")
-            new_place.add_amenity(amenity)
+        amenities = place_data.get('amenities', None)
+    
+        if amenities is not None:
+            for amenity_id in amenities:
+                if amenity_id:
+                    amenity = self.amenity_repo.get(amenity_id)
+                    if amenity is None:
+                        raise ValueError(f"Amenity with id {amenity_id} does not exist.")
+                    new_place.add_amenity(amenity)
 
         self.place_repo.add(new_place)
         owner.add_place(new_place)

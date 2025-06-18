@@ -42,9 +42,8 @@ class PlaceList(Resource):
         try:
             place_data = request.json
             
-            # Transformer les "amenities" en "amenity_ids" pour la cohérence interne
-            if 'amenities' in place_data:
-                place_data['amenity_ids'] = place_data.pop('amenities')
+            if 'amenities' not in place_data or place_data['amenities'] is None:
+                place_data['amenities'] = []
                 
             new_place = facade.create_place(place_data)
             
