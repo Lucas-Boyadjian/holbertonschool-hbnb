@@ -26,6 +26,9 @@ class HBnBFacade:
 
     def get_all_user(self):
         return self.user_repo.get_all()
+    
+    def put_user(self, user_id, data):
+        return self.user_repo.update(user_id, data)
    
     def create_place(self, place_data):
         required_fields = ['title', 'price', 'latitude', 'longitude', 'user_id']

@@ -47,6 +47,20 @@ class UserRessource(Resource):
     @api.response(200, "OK")
     @api.response(404, "Not Found")
     @api.response(400, "Bad Request")
+    @api.expect(user_model, validate=True)
     def put(self, user_id):
         """Update the data of user"""
-        
+        user_data = api.payload
+        user = facade.get_user(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+        try:
+            facade.put_user(user_id, user_data)
+            return {
+                "id": user.id,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email
+            }, 200
+        except Exception:
+            return {"error": "Bad Request"}, 400
