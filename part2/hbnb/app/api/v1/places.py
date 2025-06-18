@@ -46,7 +46,10 @@ class PlaceList(Resource):
                 place_data['amenities'] = []
                 
             new_place = facade.create_place(place_data)
-            
+
+            # Always include amenities as a list of IDs, even if empty
+            amenity_ids = [amenity.id for amenity in getattr(new_place, 'amenities', [])] if hasattr(new_place, 'amenities') else []
+
             return {
                 'id': new_place.id,
                 'title': new_place.title,
@@ -54,8 +57,8 @@ class PlaceList(Resource):
                 'price': new_place.price,
                 'latitude': new_place.latitude,
                 'longitude': new_place.longitude,
-                'owner_id': new_place.owner_id,
-                'amenities': new_place.amenities
+                'owner_id': new_place.owner.id,
+                'amenities': amenity_ids
             }, 201
             
         except ValueError as e:
