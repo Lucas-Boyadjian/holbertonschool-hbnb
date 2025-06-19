@@ -13,7 +13,6 @@ class HBnBFacade:
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
-    # Placeholder method for creating a user
     def create_user(self, user_data):
         user = User(**user_data)
         self.user_repo.add(user)
@@ -38,7 +37,7 @@ class HBnBFacade:
         required_fields = ['title', 'price', 'latitude', 'longitude', 'owner_id']
         for field in required_fields:
             if field not in place_data:
-                raise ValueError(f"Missing required field: {field}")
+                raise ValueError("Missing required field: {}".format(field))
 
         owner = self.get_user(place_data["owner_id"])
         if owner is None:
@@ -65,9 +64,9 @@ class HBnBFacade:
             
             if amenity_id:
                 amenity = self.amenity_repo.get(amenity_id)
-            if amenity is None:
-                raise ValueError(f"Amenity with id {amenity_id} does not exist.")
-            new_place.add_amenity(amenity)
+                if amenity is None:
+                    raise ValueError("Amenity with id {} does not exist.".format(amenity_id))
+                new_place.add_amenity(amenity)
 
         self.place_repo.add(new_place)
         owner.add_place(new_place)
@@ -86,7 +85,7 @@ class HBnBFacade:
         """Update a place with the given data"""
         place = self.get_place(place_id)
         if not place:
-            raise ValueError(f"Place with id {place_id} does not exist.")
+            raise ValueError("Place with id {} does not exist.".format(place_id))
     
         updatable_attrs = ['title', 'description', 'price', 'latitude', 'longitude']
         for attr in updatable_attrs:
@@ -96,21 +95,22 @@ class HBnBFacade:
         if 'amenities' in place_data:
             place.amenities = []
         
-        for amenity_item in place_data['amenities']:
-            if isinstance(amenity_item, dict):
-                amenity_id = amenity_item.get('id')
-            elif isinstance(amenity_item, str):
-                amenity_id = amenity_item
-            else:
-                continue
+            for amenity_item in place_data['amenities']:
+                if isinstance(amenity_item, dict):
+                    amenity_id = amenity_item.get('id')
+                elif isinstance(amenity_item, str):
+                    amenity_id = amenity_item
+                else:
+                    continue
                 
-            if amenity_id:
-                amenity = self.amenity_repo.get(amenity_id)
-                if amenity is None:
-                    raise ValueError(f"Amenity with id {amenity_id} does not exist.")
-                place.add_amenity(amenity)
+                if amenity_id:
+                    amenity = self.amenity_repo.get(amenity_id)
+                    if amenity is None:
+                        raise ValueError("Amenity with id {amenity_id} does not exist.".format(amenity_id))
+                    place.add_amenity(amenity)
     
         return place
+        
     
     def create_review(self, review_data):
     # Placeholder for logic to create a review, including validation for user_id, place_id, and rating
