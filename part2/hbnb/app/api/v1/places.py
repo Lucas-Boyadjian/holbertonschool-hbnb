@@ -47,10 +47,7 @@ class PlaceList(Resource):
                 
             new_place = facade.create_place(place_data)
 
-            # Always include amenities as a list of IDs, even if empty
-            amenity_ids = [amenity.id for amenity in getattr(new_place, 'amenities', [])] if hasattr(new_place, 'amenities') else []
-
-            return {
+            response = {
                 'id': new_place.id,
                 'title': new_place.title,
                 'description': new_place.description,
@@ -58,8 +55,13 @@ class PlaceList(Resource):
                 'latitude': new_place.latitude,
                 'longitude': new_place.longitude,
                 'owner_id': new_place.owner.id,
-                'amenities': amenity_ids
-            }, 201
+            }
+
+            amenity_ids = [amenity.id for amenity in new_place.amenities]
+            if amenity_ids:
+                response['amenities'] = amenity_ids
+            
+            return response, 201
             
         except ValueError as e:
             return {'error': str(e)}, 400
@@ -102,9 +104,18 @@ class PlaceResource(Resource):
                 'first_name': owner.first_name,
                 'last_name': owner.last_name,
                 'email': owner.email
+            } 
+                     
+            response = {
+                'id': place.id,
+                'title': place.title,
+                'description': place.description,
+                'price': place.price,
+                'latitude': place.latitude,
+                'longitude': place.longitude,
+                'owner': owner_data,
             }
             
-            # Récupérer les amenities
             amenities_data = [
                 {
                     'id': amenity.id,
@@ -113,17 +124,11 @@ class PlaceResource(Resource):
                 for amenity in place.amenities
             ]
             
-            return {
-                'id': place.id,
-                'title': place.title,
-                'description': place.description,
-                'price': place.price,
-                'latitude': place.latitude,
-                'longitude': place.longitude,
-                'owner': owner_data,
-                'amenities': amenities_data
-            }, 200
+            if amenities_data:
+                response['amenities'] = amenities_data
             
+            return response, 200
+        
         except Exception as e:
             return {'error': f"An unexpected error occurred: {str(e)}"}, 500
 

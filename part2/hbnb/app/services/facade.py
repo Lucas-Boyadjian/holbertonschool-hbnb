@@ -74,15 +74,18 @@ class HBnBFacade:
             owner=owner
         )
 
-        amenities = place_data.get('amenities', None)
+        amenities = place_data.get('amenities', [])
+        valid_amenities = []
     
-        if amenities is not None:
-            for amenity_id in amenities:
-                if amenity_id:
-                    amenity = self.amenity_repo.get(amenity_id)
-                    if amenity is None:
-                        raise ValueError(f"Amenity with id {amenity_id} does not exist.")
-                    new_place.add_amenity(amenity)
+        for amenity_id in amenities:
+            if amenity_id:
+                amenity = self.amenity_repo.get(amenity_id)
+                if amenity is None:
+                    raise ValueError(f"Amenity with id {amenity_id} does not exist.")
+                valid_amenities.append(amenity)
+
+        for amenity in valid_amenities:
+            new_place.add_amenity(amenity)
 
         self.place_repo.add(new_place)
         owner.add_place(new_place)
@@ -119,3 +122,30 @@ class HBnBFacade:
                 place.add_amenity(amenity)
         
         return place
+<<<<<<< HEAD
+=======
+    
+    def create_review(self, review_data):
+    # Placeholder for logic to create a review, including validation for user_id, place_id, and rating
+        pass
+
+    def get_review(self, review_id):
+    # Placeholder for logic to retrieve a review by ID
+        pass
+
+    def get_all_reviews(self):
+    # Placeholder for logic to retrieve all reviews
+        pass
+
+    def get_reviews_by_place(self, place_id):
+    # Placeholder for logic to retrieve all reviews for a specific place
+        pass
+
+    def update_review(self, review_id, review_data):
+    # Placeholder for logic to update a review
+        pass
+
+    def delete_review(self, review_id):
+    # Placeholder for logic to delete a review
+        pass
+>>>>>>> origin/main
