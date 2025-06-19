@@ -18,12 +18,15 @@ class User(BaseModel):
             raise ValueError("Invalid email")
 
     def to_dict(self):
-        return {
+        data = {
             "id_user": self.id,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email
         }
+        if self.places:
+            data["places"] = self.places
+        return data
 
     def add_place(self, place):
         self.places.append(place)
