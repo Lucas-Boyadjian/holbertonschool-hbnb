@@ -43,7 +43,7 @@ class HBnBFacade:
         owner = self.get_user(place_data["owner_id"])
         if owner is None:
             raise ValueError("Invalid owner_id: owner does not exist.")
-        
+    
         new_place = Place(
             title=place_data["title"],
             description=place_data.get("description", ""),
@@ -54,16 +54,19 @@ class HBnBFacade:
         )
 
         amenities = place_data.get('amenities', [])
-        valid_amenities = []
     
-        for amenity_id in amenities:
+        for amenity_item in amenities:
+            if isinstance(amenity_item, dict):
+                amenity_id = amenity_item.get('id')
+            elif isinstance(amenity_item, str):
+                amenity_id = amenity_item
+            else:
+                continue
+            
             if amenity_id:
                 amenity = self.amenity_repo.get(amenity_id)
-                if amenity is None:
-                    raise ValueError(f"Amenity with id {amenity_id} does not exist.")
-                valid_amenities.append(amenity)
-
-        for amenity in valid_amenities:
+            if amenity is None:
+                raise ValueError(f"Amenity with id {amenity_id} does not exist.")
             new_place.add_amenity(amenity)
 
         self.place_repo.add(new_place)
@@ -84,22 +87,29 @@ class HBnBFacade:
         place = self.get_place(place_id)
         if not place:
             raise ValueError(f"Place with id {place_id} does not exist.")
-        
+    
         updatable_attrs = ['title', 'description', 'price', 'latitude', 'longitude']
         for attr in updatable_attrs:
             if attr in place_data and place_data[attr] is not None:
                 setattr(place, attr, place_data[attr])
-        
-        if 'amenity_ids' in place_data:
+    
+        if 'amenities' in place_data:
             place.amenities = []
-            place.amenity_ids = []
-            
-            for amenity_id in place_data['amenity_ids']:
+        
+        for amenity_item in place_data['amenities']:
+            if isinstance(amenity_item, dict):
+                amenity_id = amenity_item.get('id')
+            elif isinstance(amenity_item, str):
+                amenity_id = amenity_item
+            else:
+                continue
+                
+            if amenity_id:
                 amenity = self.amenity_repo.get(amenity_id)
                 if amenity is None:
                     raise ValueError(f"Amenity with id {amenity_id} does not exist.")
                 place.add_amenity(amenity)
-        
+    
         return place
     
     def create_review(self, review_data):

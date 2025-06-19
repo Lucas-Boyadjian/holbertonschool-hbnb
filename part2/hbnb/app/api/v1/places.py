@@ -7,7 +7,6 @@ from app.services import facade
 
 api = Namespace('places', description='Place operations')
 
-# Define the models for related entities
 amenity_model = api.model('PlaceAmenity', {
     'id': fields.String(description='Amenity ID'),
     'name': fields.String(description='Name of the amenity')
@@ -20,7 +19,6 @@ user_model = api.model('PlaceUser', {
     'email': fields.String(description='Email of the owner')
 })
 
-# Adding the review model
 review_model = api.model('PlaceReview', {
     'id': fields.String(description='Review ID'),
     'text': fields.String(description='Text of the review'),
@@ -105,7 +103,6 @@ class PlaceResource(Resource):
             if not place:
                 return {'error': 'Place not found'}, 404
             
-            # Récupérer les détails du propriétaire
             owner = place.owner
             owner_data = {
                 'id': owner.id,
@@ -149,16 +146,10 @@ class PlaceResource(Resource):
         try:
             place_data = request.json
             
-            # Vérifier si le lieu existe
             place = facade.get_place(place_id)
             if not place:
                 return {'error': 'Place not found'}, 404
             
-            # Transformer les "amenities" en "amenity_ids" pour la cohérence interne
-            if 'amenities' in place_data:
-                place_data['amenity_ids'] = place_data.pop('amenities')
-            
-            # Mettre à jour le lieu
             facade.update_place(place_id, place_data)
             
             return {
