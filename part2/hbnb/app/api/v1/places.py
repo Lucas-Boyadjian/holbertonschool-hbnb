@@ -98,9 +98,9 @@ class PlaceResource(Resource):
     def get(self, place_id):
         """Get place details by ID"""
         try:
-            place = facade.get_place(place_id)
-            
-            if not place:
+            try:
+                place = facade.get_place(place_id)
+            except KeyError:
                 return {'error': 'Place not found'}, 404
             
             owner = place.owner
