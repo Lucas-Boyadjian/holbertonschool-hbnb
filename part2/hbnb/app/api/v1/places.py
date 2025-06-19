@@ -7,7 +7,6 @@ from app.services import facade
 
 api = Namespace('places', description='Place operations')
 
-# Define the models for related entities
 amenity_model = api.model('PlaceAmenity', {
     'id': fields.String(description='Amenity ID'),
     'name': fields.String(description='Name of the amenity')
@@ -20,7 +19,13 @@ user_model = api.model('PlaceUser', {
     'email': fields.String(description='Email of the owner')
 })
 
-# Define the place model for input validation and documentation
+review_model = api.model('PlaceReview', {
+    'id': fields.String(description='Review ID'),
+    'text': fields.String(description='Text of the review'),
+    'rating': fields.Integer(description='Rating of the place (1-5)'),
+    'user_id': fields.String(description='ID of the user')
+})
+
 place_model = api.model('Place', {
     'title': fields.String(required=True, description='Title of the place'),
     'description': fields.String(description='Description of the place'),
@@ -28,8 +33,9 @@ place_model = api.model('Place', {
     'latitude': fields.Float(required=True, description='Latitude of the place'),
     'longitude': fields.Float(required=True, description='Longitude of the place'),
     'owner_id': fields.String(required=True, description='ID of the owner'),
-    'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
-
+    'owner': fields.Nested(user_model, description='Owner of the place'),
+    'amenities': fields.List(fields.Nested(amenity_model), description='List of amenities'),
+    'reviews': fields.List(fields.Nested(review_model), description='List of reviews')
 })
 
 @api.route('/')
@@ -66,7 +72,7 @@ class PlaceList(Resource):
         except ValueError as e:
             return {'error': str(e)}, 400
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
@@ -83,7 +89,7 @@ class PlaceList(Resource):
                 for place in places
             ], 200
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
 @api.route('/<place_id>')
 class PlaceResource(Resource):
@@ -97,7 +103,6 @@ class PlaceResource(Resource):
             if not place:
                 return {'error': 'Place not found'}, 404
             
-            # Récupérer les détails du propriétaire
             owner = place.owner
             owner_data = {
                 'id': owner.id,
@@ -130,7 +135,7 @@ class PlaceResource(Resource):
             return response, 200
         
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
     @api.expect(place_model)
     @api.response(200, 'Place updated successfully')
@@ -141,16 +146,10 @@ class PlaceResource(Resource):
         try:
             place_data = request.json
             
-            # Vérifier si le lieu existe
             place = facade.get_place(place_id)
             if not place:
                 return {'error': 'Place not found'}, 404
             
-            # Transformer les "amenities" en "amenity_ids" pour la cohérence interne
-            if 'amenities' in place_data:
-                place_data['amenity_ids'] = place_data.pop('amenities')
-            
-            # Mettre à jour le lieu
             facade.update_place(place_id, place_data)
             
             return {
@@ -160,5 +159,5 @@ class PlaceResource(Resource):
         except ValueError as e:
             return {'error': str(e)}, 400
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
         
