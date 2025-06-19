@@ -72,7 +72,7 @@ class PlaceList(Resource):
         except ValueError as e:
             return {'error': str(e)}, 400
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
@@ -89,7 +89,7 @@ class PlaceList(Resource):
                 for place in places
             ], 200
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
 @api.route('/<place_id>')
 class PlaceResource(Resource):
@@ -135,7 +135,7 @@ class PlaceResource(Resource):
             return response, 200
         
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
     @api.expect(place_model)
     @api.response(200, 'Place updated successfully')
@@ -159,5 +159,5 @@ class PlaceResource(Resource):
         except ValueError as e:
             return {'error': str(e)}, 400
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
         
