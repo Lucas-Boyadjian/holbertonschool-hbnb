@@ -17,3 +17,9 @@ class Amenity(BaseModel):
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
         }
+    def update(self, data):
+        if "name" in data:
+            if not data["name"] or len(data["name"]) > 50:
+                raise ValueError("Invalid name")
+            self.name = data["name"]
+        self.updated_at = datetime.datetime.now()
