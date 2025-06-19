@@ -122,8 +122,6 @@ class HBnBFacade:
                 place.add_amenity(amenity)
         
         return place
-<<<<<<< HEAD
-=======
     
     def create_review(self, review_data):
     # Placeholder for logic to create a review, including validation for user_id, place_id, and rating
@@ -148,4 +146,3 @@ class HBnBFacade:
     def delete_review(self, review_id):
     # Placeholder for logic to delete a review
         pass
->>>>>>> origin/main
