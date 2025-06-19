@@ -133,25 +133,79 @@ class HBnBFacade:
         return place
     
     def create_review(self, review_data):
-    # Placeholder for logic to create a review, including validation for user_id, place_id, and rating
-        pass
+        """Create a new review with validation"""
+        required_fields = ['text', 'rating', 'user_id', 'place_id']
+        for field in required_fields:
+            if field not in review_data:
+                raise ValueError(f"Missing required field: {field}")
+    
+        rating = review_data['rating']
+        if not isinstance(rating, int) or not (1 <= rating <= 5):
+            raise ValueError("Rating must be an integer between 1 and 5")
+    
+        user = self.user_repo.get(review_data['user_id'])
+        if user is None:
+            raise ValueError(f"User with id {review_data['user_id']} does not exist.")
+    
+        place = self.place_repo.get(review_data['place_id'])
+        if place is None:
+            raise ValueError(f"Place with id {review_data['place_id']} does not exist.")
+    
+        from app.models.review import Review
+        new_review = Review(
+            text=review_data['text'],
+            rating=review_data['rating'],
+            place=place,
+            user=user
+        )
+    
+        self.review_repo.add(new_review)
+    
+        place.add_review(new_review)
+    
+        return new_review
 
     def get_review(self, review_id):
-    # Placeholder for logic to retrieve a review by ID
-        pass
+        """Retrieve a review by ID"""
+        review = self.review_repo.get(review_id)
+        if review is None:
+            raise KeyError("Review not found.")
+        return review
 
     def get_all_reviews(self):
-    # Placeholder for logic to retrieve all reviews
-        pass
+        """Retrieve all reviews"""
+        return self.review_repo.get_all()
 
     def get_reviews_by_place(self, place_id):
-    # Placeholder for logic to retrieve all reviews for a specific place
-        pass
+        """Retrieve all reviews for a specific place"""
+        place = self.place_repo.get(place_id)
+        if place is None:
+            raise KeyError("Place not found.")
+        return place.reviews
 
     def update_review(self, review_id, review_data):
-    # Placeholder for logic to update a review
-        pass
+        """Update a review"""
+        review = self.get_review(review_id)
+    
+        if 'text' in review_data:
+            review.text = review_data['text']
+    
+        if 'rating' in review_data:
+            rating = review_data['rating']
+            if not isinstance(rating, int) or not (1 <= rating <= 5):
+                raise ValueError("Rating must be an integer between 1 and 5")
+            review.rating = rating
+    
+        return review
 
     def delete_review(self, review_id):
-    # Placeholder for logic to delete a review
-        pass
+        """Delete a review"""
+        review = self.get_review(review_id)
+    
+        if hasattr(review, 'place') and review.place:
+            if review in review.place.reviews:
+                review.place.reviews.remove(review)
+    
+        self.review_repo.delete(review_id)
+    
+        return True

@@ -131,6 +131,19 @@ class PlaceResource(Resource):
             
             if amenities_data:
                 response['amenities'] = amenities_data
+
+            reviews_data = [
+                {
+                    'id': review.id,
+                    'text': review.text,
+                    'rating': review.rating,
+                    'user_id': review.user.id
+                }
+                for review in place.reviews
+            ]
+        
+            if reviews_data:
+                response['reviews'] = reviews_data
             
             return response, 200
         
