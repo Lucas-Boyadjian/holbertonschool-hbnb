@@ -5,7 +5,7 @@ api = Namespace('amenities', description='Amenity operations')
 
 # Define the amenity model for input validation and documentation
 amenity_model = api.model('Amenity', {
-    'name': fields.String(required=True, description='Name of the amenity')
+    'name': fields.String(required=True, min_length=1, description='Name of the amenity')
 })
 
 @api.route('/')
@@ -16,7 +16,10 @@ class AmenityList(Resource):
     def post(self):
         """Register a new amenity"""
         data_amenity = api.payload
-        new_amenity = facade.create_amenity(data_amenity)
+        try:
+            new_amenity = facade.create_amenity(data_amenity)
+        except ValueError as e:
+            api.abort(400, str(e))
         return {"id": new_amenity.id, "name":new_amenity.name}, 201
     @api.response(200, 'List of amenities retrieved successfully')
     def get(self):
@@ -48,6 +51,8 @@ class AmenityResource(Resource):
         amenity=facade.get_amenity(amenity_id)
         if amenity is None:
             api.abort(404,"Amenity not found")
-        
-        updated_amenity = facade.update_amenity(amenity_id, data_amenity)
+        try:
+            updated_amenity = facade.update_amenity(amenity_id, data_amenity)
+        except ValueError as e:
+            api.abort(400, str(e))
         return updated_amenity.to_dict(), 200
