@@ -98,9 +98,9 @@ class PlaceResource(Resource):
     def get(self, place_id):
         """Get place details by ID"""
         try:
-            place = facade.get_place(place_id)
-            
-            if not place:
+            try:
+                place = facade.get_place(place_id)
+            except KeyError:
                 return {'error': 'Place not found'}, 404
             
             owner = place.owner
@@ -145,19 +145,19 @@ class PlaceResource(Resource):
         """Update a place's information"""
         try:
             place_data = request.json
-            
-            place = facade.get_place(place_id)
-            if not place:
+        
+            try:
+                place = facade.get_place(place_id)
+            except KeyError:
                 return {'error': 'Place not found'}, 404
-            
+        
             facade.update_place(place_id, place_data)
-            
+        
             return {
                 'message': 'Place updated successfully'
             }, 200
-            
+        
         except ValueError as e:
             return {'error': str(e)}, 400
         except Exception as e:
             return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
-        
