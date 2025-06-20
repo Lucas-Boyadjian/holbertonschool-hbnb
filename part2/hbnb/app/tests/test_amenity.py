@@ -1,9 +1,6 @@
-<<<<<<< HEAD
-=======
 #!/usr/bin/env python3
 
 import pytest
->>>>>>> origin/main
 from app.models.amenity import Amenity
 from app import create_app
 
