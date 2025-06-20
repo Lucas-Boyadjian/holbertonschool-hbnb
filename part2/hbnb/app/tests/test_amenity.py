@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from app.models.amenity import Amenity
 
 def test_amenity_creation():
