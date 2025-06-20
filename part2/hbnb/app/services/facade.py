@@ -28,7 +28,11 @@ class HBnBFacade:
         return self.user_repo.get_all()
     
     def put_user(self, user_id, data):
-        return self.user_repo.update(user_id, data)
+        user = self.user_repo.get(user_id)
+        if not user:
+            return None
+        user.update(data)
+        return user
    
     def get_all_user(self):
         return self.user_repo.get_all()
