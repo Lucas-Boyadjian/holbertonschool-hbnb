@@ -10,12 +10,16 @@ class User(BaseModel):
         self.email = email
         self.is_admin = is_admin
         self.places = []
+
         if not first_name or len(first_name) > 50:
             raise ValueError("Invalid first name")
         if not last_name or len(last_name) > 50:
             raise ValueError("Invalid last name")
         if not email or '@' not in email:
             raise ValueError("Invalid email")
+
+    def add_place(self, place):
+        self.places.append(place)
 
     def to_dict(self):
         data = {
@@ -27,7 +31,3 @@ class User(BaseModel):
         if self.places:
             data["places"] = self.places
         return data
-
-    def add_place(self, place):
-        self.places.append(place)
-    
