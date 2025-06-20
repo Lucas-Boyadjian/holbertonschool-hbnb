@@ -1,5 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+import re
+
 
 api = Namespace('users', description='User operations')
 
@@ -9,6 +11,10 @@ user_model = api.model('User', {
     'last_name': fields.String(required=True, description='Last name of the user'),
     'email': fields.String(required=True, description='Email of the user')
 })
+
+def is_valid_email(email):
+    pattern = r"^[^@]+@[^@]+\.[^@]+$"
+    return re.match(pattern, email) is not None
 
 @api.route('/')
 class UserList(Resource):
@@ -20,12 +26,12 @@ class UserList(Resource):
         """Register a new user"""
         try:
             user_data = api.payload
-
             # Simulate email uniqueness check (to be replaced by real validation with persistence)
             existing_user = facade.get_user_by_email(user_data['email'])
             if existing_user:
                 return {'error': 'Email already registered'}, 400
-
+            if not is_valid_email(user_data["email"]):
+                return {"error": "Invalid email"}, 400
             new_user = facade.create_user(user_data)
             return new_user.to_dict(), 201
         except ValueError as e:
@@ -54,11 +60,15 @@ class UserRessource(Resource):
     def put(self, user_id):
         """Update the data of user"""
         user_data = api.payload
-        user = facade.get_user(user_id)
-        if not user:
-            return {"error": "User not found"}, 404
+        if not is_valid_email(user_data["email"]):
+            return {"error": "Invalid email"}, 400
         try:
-            facade.put_user(user_id, user_data)
-            return user.to_dict(), 200
-        except Exception:
+            updated_user = facade.put_user(user_id, user_data)
+            if not updated_user:
+                return {"error": "User not found"}, 404
+            return updated_user.to_dict(), 200
+        except ValueError as e:
+            return {"error": str(e)}, 400
+        except Exception as e:
+            print(e)
             return {"error": "Bad Request"}, 400
