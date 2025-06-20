@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
 
 from .basemodel import BaseModel
-import datetime
 
 class Amenity(BaseModel):
     def __init__(self, name):
         super().__init__()
-        if not name or len(name) > 50:
-            raise ValueError("Invalid name")
         self.name = name
+    @property
+    def name(self):
+        return self._name
     
+    @name.setter
+    def name(self, value):
+        if not value or len(value) > 50:
+            raise ValueError("invalid name")
+        self._name = value    
     def to_dict(self,):
         return {
             "id": self.id,
