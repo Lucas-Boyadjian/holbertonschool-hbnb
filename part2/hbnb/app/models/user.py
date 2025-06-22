@@ -10,12 +10,36 @@ class User(BaseModel):
         self.email = email
         self.is_admin = is_admin
         self.places = []
-        if not first_name or len(first_name) > 50:
+
+    @property
+    def first_name(self):
+        return self._first_name
+    
+    @first_name.setter
+    def first_name(self, value):
+        if not value or len(value) > 50:
             raise ValueError("Invalid first name")
-        if not last_name or len(last_name) > 50:
+        self._first_name = value
+
+    @property
+    def last_name(self):
+        return self._last_name
+    
+    @last_name.setter
+    def last_name(self, value):
+        if not value or len(value) > 50:
             raise ValueError("Invalid last name")
-        if not email or '@' not in email:
+        self._last_name = value
+
+    @property
+    def email(self):
+        return self._email
+    
+    @email.setter
+    def email(self, value):
+        if not value or '@' not in value:
             raise ValueError("Invalid email")
+        self._email = value
 
     def add_place(self, place):
         self.places.append(place)
@@ -28,7 +52,7 @@ class User(BaseModel):
         if "last_name" in data:
             if not data["last_name"] or len(data["last_name"]) > 50:
                 raise ValueError("Invalid last name")
-            self.first_name = data["last_name"]
+            self.last_name = data["last_name"]
         if "email" in data:
             if not data["email"] or '@' not in data["email"]:
                 raise ValueError("Invalid email")
