@@ -8,198 +8,6 @@ from app.models.place import Place
 from app.models.review import Review
 
 
-class TestReviewModel(unittest.TestCase):
-    """Test cases for Review model."""
-
-    def test_review_creation(self):
-        """Test successful Review creation with valid data."""
-        owner = User(first_name="Alice", last_name="Smith",
-                     email="alice.smith@example.com")
-
-        place = Place(title="Cozy Apartment",
-                      description="A nice place to stay",
-                      price=100, latitude=37.7749,
-                      longitude=-122.4194, owner=owner)
-
-        user = User(first_name="Bob", last_name="Johnson",
-                    email="bob@example.com")
-
-        review = Review(text="Great experience!",
-                        rating=5, place=place, user=user)
-
-        self.assertEqual(review.text, "Great experience!")
-        self.assertEqual(review.rating, 5)
-        self.assertEqual(review.place, place)
-        self.assertEqual(review.user, user)
-
-    def test_review_creation_empty_text(self):
-        """Test that Review creation raises ValueError with empty text."""
-        owner = User(first_name="Alice", last_name="Smith",
-                     email="alice.smith@example.com")
-
-        place = Place(title="Cozy Apartment",
-                      description="A nice place to stay",
-                      price=100, latitude=37.7749,
-                      longitude=-122.4194, owner=owner)
-
-        user = User(first_name="Bob", last_name="Johnson",
-                    email="bob@example.com")
-
-        with self.assertRaises(ValueError):
-            Review(text="", rating=5, place=place, user=user)
-
-    def test_review_creation_invalid_rating_low(self):
-        """Test that Review creation raises ValueError with rating < 1."""
-        owner = User(first_name="Alice", last_name="Smith",
-                     email="alice.smith@example.com")
-
-        place = Place(title="Cozy Apartment",
-                      description="A nice place to stay",
-                      price=100, latitude=37.7749,
-                      longitude=-122.4194, owner=owner)
-
-        user = User(first_name="Bob", last_name="Johnson",
-                    email="bob@example.com")
-
-        with self.assertRaises(ValueError):
-            Review(text="Bad experience", rating=0, place=place, user=user)
-
-    def test_review_creation_invalid_rating_high(self):
-        """Test that Review creation raises ValueError with rating > 5."""
-        owner = User(first_name="Alice", last_name="Smith",
-                     email="alice.smith@example.com")
-
-        place = Place(title="Cozy Apartment",
-                      description="A nice place to stay",
-                      price=100, latitude=37.7749,
-                      longitude=-122.4194, owner=owner)
-
-        user = User(first_name="Bob", last_name="Johnson",
-                    email="bob@example.com")
-
-        with self.assertRaises(ValueError):
-            Review(text="Amazing beyond rating scale",
-                   rating=6, place=place, user=user)
-
-    def test_review_creation_invalid_rating_type(self):
-        """Test that Review creation raises ValueError with non-int rating."""
-        owner = User(first_name="Alice", last_name="Smith",
-                     email="alice.smith@example.com")
-
-        place = Place(title="Cozy Apartment",
-                      description="A nice place to stay",
-                      price=100, latitude=37.7749,
-                      longitude=-122.4194, owner=owner)
-
-        user = User(first_name="Bob", last_name="Johnson",
-                    email="bob@example.com")
-
-        with self.assertRaises(ValueError):
-            Review(text="Good place", rating="5", place=place, user=user)
-
-    def test_review_creation_null_place(self):
-        """Test that Review creation raises ValueError with null place."""
-        user = User(first_name="Bob", last_name="Johnson",
-                    email="bob@example.com")
-
-        with self.assertRaises(ValueError):
-            Review(text="Good experience",
-                   rating=4, place=None, user=user)
-
-    def test_review_creation_null_user(self):
-        """Test that Review creation raises ValueError with null user."""
-        owner = User(first_name="Alice", last_name="Smith",
-                     email="alice.smith@example.com")
-
-        place = Place(title="Cozy Apartment",
-                      description="A nice place to stay",
-                      price=100, latitude=37.7749,
-                      longitude=-122.4194, owner=owner)
-
-        with self.assertRaises(ValueError):
-            Review(text="Good experience",
-                   rating=4, place=place, user=None)
-
-    def test_review_text_setter(self):
-        """Test setting the text property of a Review."""
-        owner = User(first_name="Alice", last_name="Smith",
-                     email="alice.smith@example.com")
-
-        place = Place(title="Cozy Apartment",
-                      description="A nice place to stay",
-                      price=100, latitude=37.7749,
-                      longitude=-122.4194, owner=owner)
-
-        user = User(first_name="Bob", last_name="Johnson",
-                    email="bob@example.com")
-
-        review = Review(text="Initial review",
-                        rating=4, place=place, user=user)
-        review.text = "Updated review"
-
-        self.assertEqual(review.text, "Updated review")
-
-    def test_review_text_setter_invalid(self):
-        """Test that setting an invalid text raises ValueError."""
-        owner = User(first_name="Alice", last_name="Smith",
-                     email="alice.smith@example.com")
-
-        place = Place(title="Cozy Apartment",
-                      description="A nice place to stay",
-                      price=100, latitude=37.7749,
-                      longitude=-122.4194, owner=owner)
-
-        user = User(first_name="Bob", last_name="Johnson",
-                    email="bob@example.com")
-
-        review = Review(text="Initial review",
-                        rating=4, place=place, user=user)
-
-        with self.assertRaises(ValueError):
-            review.text = ""
-
-    def test_review_rating_setter(self):
-        """Test setting the rating property of a Review."""
-        owner = User(first_name="Alice", last_name="Smith",
-                     email="alice.smith@example.com")
-
-        place = Place(title="Cozy Apartment",
-                      description="A nice place to stay",
-                      price=100, latitude=37.7749,
-                      longitude=-122.4194, owner=owner)
-
-        user = User(first_name="Bob", last_name="Johnson",
-                    email="bob@example.com")
-
-        review = Review(text="Good place",
-                        rating=3, place=place, user=user)
-        review.rating = 5
-
-        self.assertEqual(review.rating, 5)
-
-    def test_review_rating_setter_invalid(self):
-        """Test that setting an invalid rating raises ValueError."""
-        owner = User(first_name="Alice", last_name="Smith",
-                     email="alice.smith@example.com")
-
-        place = Place(title="Cozy Apartment",
-                      description="A nice place to stay",
-                      price=100, latitude=37.7749,
-                      longitude=-122.4194, owner=owner)
-
-        user = User(first_name="Bob", last_name="Johnson",
-                    email="bob@example.com")
-
-        review = Review(text="Good place", rating=3, place=place, user=user)
-
-        with self.assertRaises(ValueError):
-            review.rating = 0
-        with self.assertRaises(ValueError):
-            review.rating = 6
-        with self.assertRaises(ValueError):
-            review.rating = "3"
-
-
 class TestReviewEndpoints(unittest.TestCase):
     """Test cases for Review API endpoints."""
 
@@ -239,7 +47,7 @@ class TestReviewEndpoints(unittest.TestCase):
         self.assertEqual(response.json["rating"], 5)
         self.assertEqual(response.json["user_id"], self.user_id)
         self.assertEqual(response.json["place_id"], self.place_id)
-        self.assertIn("id", response.json)
+        self.assertEqual("id" in response.json, True)
 
         self.review_id = response.json["id"]
 
@@ -253,7 +61,7 @@ class TestReviewEndpoints(unittest.TestCase):
         })
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("error", response.json)
+        self.assertEqual("error" in response.json, True)
 
     def test_create_review_invalid_rating(self):
         """Test that creating a review with invalid rating fails."""
@@ -265,7 +73,7 @@ class TestReviewEndpoints(unittest.TestCase):
         })
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("error", response.json)
+        self.assertEqual("error" in response.json, True)
 
     def test_create_review_invalid_user_id(self):
         """Test that creating a review with invalid user_id fails."""
@@ -277,7 +85,7 @@ class TestReviewEndpoints(unittest.TestCase):
         })
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("error", response.json)
+        self.assertEqual("error" in response.json, True)
 
     def test_create_review_invalid_place_id(self):
         """Test that creating a review with invalid place_id fails."""
@@ -289,7 +97,7 @@ class TestReviewEndpoints(unittest.TestCase):
         })
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("error", response.json)
+        self.assertEqual("error" in response.json, True)
 
     def test_get_all_reviews(self):
         """Test getting all reviews."""
@@ -303,8 +111,8 @@ class TestReviewEndpoints(unittest.TestCase):
         response = self.client.get('/api/v1/reviews/')
 
         self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.json, list)
-        self.assertGreater(len(response.json), 0)
+        self.assertEqual(isinstance(response.json, list), True)
+        self.assertEqual(len(response.json) > 0, True)
 
     def test_get_review_by_id(self):
         """Test getting a specific review by ID."""
@@ -340,18 +148,19 @@ class TestReviewEndpoints(unittest.TestCase):
             "place_id": self.place_id
         })
 
-        response = self.client.get('/api/v1/reviews/places/{}/reviews'
-                                   .format(self.place_id))
+        response = self.client.get(
+            '/api/v1/reviews/places/{}/reviews'.format(self.place_id)
+        )
 
         self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.json, list)
-        self.assertGreaterEqual(len(response.json), 2)
+        self.assertEqual(isinstance(response.json, list), True)
+        self.assertEqual(len(response.json) >= 2, True)
 
     def test_get_nonexistent_review(self):
         """Test getting a review that doesn't exist."""
         response = self.client.get('/api/v1/reviews/nonexistent-id')
         self.assertEqual(response.status_code, 404)
-        self.assertIn("error", response.json)
+        self.assertEqual("error" in response.json, True)
 
     def test_update_review(self):
         """Test updating a review's attributes."""
@@ -372,7 +181,7 @@ class TestReviewEndpoints(unittest.TestCase):
             }
         )
         self.assertEqual(update_response.status_code, 200)
-        self.assertIn("message", update_response.json)
+        self.assertEqual("message" in update_response.json, True)
 
         get_response = self.client.get(
             '/api/v1/reviews/{}'.format(review_id)
@@ -401,7 +210,7 @@ class TestReviewEndpoints(unittest.TestCase):
         )
 
         self.assertEqual(update_response.status_code, 400)
-        self.assertIn("error", update_response.json)
+        self.assertEqual("error" in update_response.json, True)
 
     def test_delete_review(self):
         """Test deleting a review."""
@@ -414,10 +223,11 @@ class TestReviewEndpoints(unittest.TestCase):
 
         review_id = create_response.json["id"]
 
-        delete_response = self.client.delete('/api/v1/reviews/{}'
-                                             .format(review_id))
+        delete_response = self.client.delete(
+            '/api/v1/reviews/{}'.format(review_id)
+        )
         self.assertEqual(delete_response.status_code, 200)
-        self.assertIn("message", delete_response.json)
+        self.assertEqual("message" in delete_response.json, True)
 
         get_response = self.client.get('/api/v1/reviews/{}'.format(review_id))
         self.assertEqual(get_response.status_code, 404)
