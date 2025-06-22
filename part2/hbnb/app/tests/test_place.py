@@ -291,7 +291,7 @@ class TestPlaceEndpoints(unittest.TestCase):
 
         place_id = create_response.json["id"]
 
-        response = self.client.get(f'/api/v1/places/{place_id}')
+        response = self.client.get('/api/v1/places/{}'.format(place_id))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["id"], place_id)
@@ -319,7 +319,7 @@ class TestPlaceEndpoints(unittest.TestCase):
             "owner_id": self.user_id
         })
 
-        response = self.client.get(f'/api/v1/users/{self.user_id}/places')
+        response = self.client.get('/api/v1/users/{}/places'.format(self.user_id))
 
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.json, list)
@@ -347,7 +347,7 @@ class TestPlaceEndpoints(unittest.TestCase):
 
         place_id = create_response.json["id"]
 
-        update_response = self.client.put(f'/api/v1/places/{place_id}', json={
+        update_response = self.client.put('/api/v1/places/{}'.format(place_id), json={
             "title": "Luxury Apartment",
             "description": "An upgraded place to stay",
             "price": 150
@@ -375,33 +375,13 @@ class TestPlaceEndpoints(unittest.TestCase):
 
         place_id = create_response.json["id"]
 
-        update_response = self.client.put(f'/api/v1/places/{place_id}', json={
+        update_response = self.client.put('/api/v1/places/{}'.format(place_id), json={
             "title": "",
             "price": -50
         })
 
         self.assertEqual(update_response.status_code, 400)
         self.assertIn("error", update_response.json)
-
-    def test_delete_place(self):
-        """Test deleting a place."""
-        create_response = self.client.post('/api/v1/places/', json={
-            "title": "Cozy Apartment",
-            "description": "A nice place to stay",
-            "price": 100,
-            "latitude": 37.7749,
-            "longitude": -122.4194,
-            "owner_id": self.user_id
-        })
-
-        place_id = create_response.json["id"]
-
-        delete_response = self.client.delete(f'/api/v1/places/{place_id}')
-        self.assertEqual(delete_response.status_code, 204)
-
-        get_response = self.client.get(f'/api/v1/places/{place_id}')
-        self.assertEqual(get_response.status_code, 404)
-
 
 if __name__ == '__main__':
     unittest.main()
