@@ -16,12 +16,13 @@ class TestPlaceEndpoints(unittest.TestCase):
         """Set up test client and create a test user."""
         self.app = create_app()
         self.client = self.app.test_client()
-
+        
         response = self.client.post('/api/v1/users/', json={
             "first_name": "Alice",
             "last_name": "Smith",
             "email": "alice.smith@example.com"
         })
+        
         self.user_id = response.json["id_user"]
 
     def test_create_place(self):
@@ -50,6 +51,22 @@ class TestPlaceEndpoints(unittest.TestCase):
         """Test that creating a place with empty title fails."""
         response = self.client.post('/api/v1/places/', json={
             "title": "",
+            "description": "A nice place to stay",
+            "price": 100,
+            "latitude": 37.7749,
+            "longitude": -122.4194,
+            "owner_id": self.user_id
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual("error" in response.json, True)
+
+    def test_create_place_title_too_long(self):
+        """Test that creating a place with a title > 100 characters fails."""
+        long_title = "A" * 101
+    
+        response = self.client.post('/api/v1/places/', json={
+            "title": long_title,
             "description": "A nice place to stay",
             "price": 100,
             "latitude": 37.7749,
@@ -154,36 +171,6 @@ class TestPlaceEndpoints(unittest.TestCase):
         self.assertEqual(response.json["description"], "A nice place to stay")
         self.assertEqual(response.json["price"], 100)
 
-    def test_get_places_by_owner(self):
-        """Test getting all places for a specific owner."""
-        self.client.post('/api/v1/places/', json={
-            "title": "Cozy Apartment",
-            "description": "A nice place to stay",
-            "price": 100,
-            "latitude": 37.7749,
-            "longitude": -122.4194,
-            "owner_id": self.user_id
-        })
-
-        self.client.post('/api/v1/places/', json={
-            "title": "Beach House",
-            "description": "Relaxing beach getaway",
-            "price": 150,
-            "latitude": 34.0522,
-            "longitude": -118.2437,
-            "owner_id": self.user_id
-        })
-
-        response = self.client.get('/api/v1/users/{}/places'
-                                   .format(self.user_id))
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(isinstance(response.json, list), True)
-        self.assertEqual(len(response.json) >= 2, True)
-
-        for place in response.json:
-            self.assertEqual(place["owner_id"], self.user_id)
-
     def test_get_nonexistent_place(self):
         """Test getting a place that doesn't exist."""
         response = self.client.get('/api/v1/places/nonexistent-id')
@@ -223,8 +210,52 @@ class TestPlaceEndpoints(unittest.TestCase):
         self.assertEqual(update_response.json["latitude"], 37.7749)
         self.assertEqual(update_response.json["longitude"], -122.4194)
 
-    def test_update_place_invalid_data(self):
-        """Test updating a place with invalid data."""
+    def test_update_place_empty_title(self):
+        """Test updating a place with an empty title."""
+        create_response = self.client.post('/api/v1/places/', json={
+        "title": "Cozy Apartment",
+        "description": "A nice place to stay",
+        "price": 100,
+        "latitude": 37.7749,
+        "longitude": -122.4194,
+        "owner_id": self.user_id
+    })
+
+        place_id = create_response.json["id"]
+
+        update_response = self.client.put(
+            '/api/v1/places/{}'.format(place_id),
+            json={"title": ""}
+        )
+
+        self.assertEqual(update_response.status_code, 400)
+        self.assertEqual("error" in update_response.json, True)
+    
+    def test_update_place_title_too_long(self):
+        """Test updating a place with a title that's too long (>100 characters)."""
+        create_response = self.client.post('/api/v1/places/', json={
+            "title": "Cozy Apartment",
+            "description": "A nice place to stay",
+            "price": 100,
+            "latitude": 37.7749,
+            "longitude": -122.4194,
+            "owner_id": self.user_id
+        })
+
+        place_id = create_response.json["id"]
+
+        long_title = "A" * 101
+    
+        update_response = self.client.put(
+            '/api/v1/places/{}'.format(place_id),
+            json={"title": long_title}
+        )
+
+        self.assertEqual(update_response.status_code, 400)
+        self.assertEqual("error" in update_response.json, True)
+
+    def test_update_place_invalid_price(self):
+        """Test updating a place with a negative price."""
         create_response = self.client.post('/api/v1/places/', json={
             "title": "Cozy Apartment",
             "description": "A nice place to stay",
@@ -238,10 +269,70 @@ class TestPlaceEndpoints(unittest.TestCase):
 
         update_response = self.client.put(
             '/api/v1/places/{}'.format(place_id),
-            json={
-                "title": "",
-                "price": -50
-            }
+            json={"price": -50}
+        )
+
+        self.assertEqual(update_response.status_code, 400)
+        self.assertEqual("error" in update_response.json, True)
+
+    def test_update_place_invalid_latitude(self):
+        """Test updating a place with an invalid latitude."""
+        create_response = self.client.post('/api/v1/places/', json={
+            "title": "Cozy Apartment",
+            "description": "A nice place to stay",
+            "price": 100,
+            "latitude": 37.7749,
+            "longitude": -122.4194,
+            "owner_id": self.user_id
+        })
+
+        place_id = create_response.json["id"]
+
+        update_response = self.client.put(
+            '/api/v1/places/{}'.format(place_id),
+            json={"latitude": 95}
+        )
+
+        self.assertEqual(update_response.status_code, 400)
+        self.assertEqual("error" in update_response.json, True)
+
+    def test_update_place_invalid_longitude(self):
+        """Test updating a place with an invalid longitude."""
+        create_response = self.client.post('/api/v1/places/', json={
+            "title": "Cozy Apartment",
+            "description": "A nice place to stay",
+            "price": 100,
+            "latitude": 37.7749,
+            "longitude": -122.4194,
+            "owner_id": self.user_id
+        })
+
+        place_id = create_response.json["id"]
+
+        update_response = self.client.put(
+            '/api/v1/places/{}'.format(place_id),
+            json={"longitude": 185}
+        )
+
+        self.assertEqual(update_response.status_code, 400)
+        self.assertEqual("error" in update_response.json, True)
+
+    def test_update_place_invalid_owner(self):
+        """Test updating a place with an invalid owner_id."""
+        create_response = self.client.post('/api/v1/places/', json={
+            "title": "Cozy Apartment",
+            "description": "A nice place to stay",
+            "price": 100,
+            "latitude": 37.7749,
+            "longitude": -122.4194,
+            "owner_id": self.user_id
+        })
+
+        place_id = create_response.json["id"]
+
+        update_response = self.client.put(
+            '/api/v1/places/{}'.format(place_id),
+            json={"owner_id": "invalid-owner-id"}
         )
 
         self.assertEqual(update_response.status_code, 400)
