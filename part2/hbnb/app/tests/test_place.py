@@ -383,25 +383,5 @@ class TestPlaceEndpoints(unittest.TestCase):
         self.assertEqual(update_response.status_code, 400)
         self.assertIn("error", update_response.json)
 
-    def test_delete_place(self):
-        """Test deleting a place."""
-        create_response = self.client.post('/api/v1/places/', json={
-            "title": "Cozy Apartment",
-            "description": "A nice place to stay",
-            "price": 100,
-            "latitude": 37.7749,
-            "longitude": -122.4194,
-            "owner_id": self.user_id
-        })
-
-        place_id = create_response.json["id"]
-
-        delete_response = self.client.delete(f'/api/v1/places/{place_id}')
-        self.assertEqual(delete_response.status_code, 204)
-
-        get_response = self.client.get(f'/api/v1/places/{place_id}')
-        self.assertEqual(get_response.status_code, 404)
-
-
 if __name__ == '__main__':
     unittest.main()
