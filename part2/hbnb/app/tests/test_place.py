@@ -291,7 +291,7 @@ class TestPlaceEndpoints(unittest.TestCase):
 
         place_id = create_response.json["id"]
 
-        response = self.client.get(f'/api/v1/places/{place_id}')
+        response = self.client.get('/api/v1/places/{}'.format(place_id))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["id"], place_id)
@@ -319,7 +319,7 @@ class TestPlaceEndpoints(unittest.TestCase):
             "owner_id": self.user_id
         })
 
-        response = self.client.get(f'/api/v1/users/{self.user_id}/places')
+        response = self.client.get('/api/v1/users/{}/places'.format(self.user_id))
 
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.json, list)
@@ -347,7 +347,7 @@ class TestPlaceEndpoints(unittest.TestCase):
 
         place_id = create_response.json["id"]
 
-        update_response = self.client.put(f'/api/v1/places/{place_id}', json={
+        update_response = self.client.put('/api/v1/places/{}'.format(place_id), json={
             "title": "Luxury Apartment",
             "description": "An upgraded place to stay",
             "price": 150
@@ -375,7 +375,7 @@ class TestPlaceEndpoints(unittest.TestCase):
 
         place_id = create_response.json["id"]
 
-        update_response = self.client.put(f'/api/v1/places/{place_id}', json={
+        update_response = self.client.put('/api/v1/places/{}'.format(place_id), json={
             "title": "",
             "price": -50
         })
