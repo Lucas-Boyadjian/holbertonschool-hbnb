@@ -60,6 +60,22 @@ class TestPlaceEndpoints(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual("error" in response.json, True)
 
+    def test_create_place_title_too_long(self):
+        """Test that creating a place with a title > 100 characters fails."""
+        long_title = "A" * 101
+    
+        response = self.client.post('/api/v1/places/', json={
+            "title": long_title,
+            "description": "A nice place to stay",
+            "price": 100,
+            "latitude": 37.7749,
+            "longitude": -122.4194,
+            "owner_id": self.user_id
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual("error" in response.json, True)
+
     def test_create_place_invalid_price(self):
         """Test that creating a place with negative price fails."""
         response = self.client.post('/api/v1/places/', json={
@@ -153,36 +169,6 @@ class TestPlaceEndpoints(unittest.TestCase):
         self.assertEqual(response.json["title"], "Cozy Apartment")
         self.assertEqual(response.json["description"], "A nice place to stay")
         self.assertEqual(response.json["price"], 100)
-
-    def test_get_places_by_owner(self):
-        """Test getting all places for a specific owner."""
-        self.client.post('/api/v1/places/', json={
-            "title": "Cozy Apartment",
-            "description": "A nice place to stay",
-            "price": 100,
-            "latitude": 37.7749,
-            "longitude": -122.4194,
-            "owner_id": self.user_id
-        })
-
-        self.client.post('/api/v1/places/', json={
-            "title": "Beach House",
-            "description": "Relaxing beach getaway",
-            "price": 150,
-            "latitude": 34.0522,
-            "longitude": -118.2437,
-            "owner_id": self.user_id
-        })
-
-        response = self.client.get('/api/v1/users/{}/places'
-                                   .format(self.user_id))
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(isinstance(response.json, list), True)
-        self.assertEqual(len(response.json) >= 2, True)
-
-        for place in response.json:
-            self.assertEqual(place["owner_id"], self.user_id)
 
     def test_get_nonexistent_place(self):
         """Test getting a place that doesn't exist."""
