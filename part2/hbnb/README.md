@@ -54,6 +54,18 @@ hbnb/
 ```
 
 ---
+## Installation
+
+1. Clone le dépôt :
+```bash
+git clone https://github.com/yourusername/holbertonschool-hbnb.git
+   cd holbertonschool-hbnb/part2/hbnb
+```
+2. Installer les dépendances nécessaires:
+```bash
+pip install -r requirements.txt
+```
+---
 
 ## Fonctionnalités principales
 
@@ -100,26 +112,56 @@ hbnb/
 
 ---
 
----
+## Exemples tests
 
-## Installation
+### Amenity
 
-1. Clone le dépôt :
-   ```bash
-   git clone https://github.com/yourusername/holbertonschool-hbnb.git
-   cd holbertonschool-hbnb/part2/hbnb
-   ```
-2. Installer les dépendances nécessaires:
-```bash
-pip install -r requirements.txt
+```python
+
+def test_api_create_amenity_valid(client):
+    response = client.post('/api/v1/amenities/', json={"name": "Wi-Fi"})
+    assert response.status_code == 201
+    assert response.json["name"] == "Wi-Fi"
+
+def test_api_create_amenity_invalid(client):
+    response = client.post('/api/v1/amenities/', json={"name": ""})
+    assert response.status_code == 400
 ```
+### User
 
+```python
+
+def test_create_user(self):
+        """Test creating a user with valid data."""
+        response = self.client.post('/api/v1/users/', json={
+            "first_name": "Alice",
+            "last_name": "Smith",
+            "email": "alice.smith@example.com"
+        })
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json["first_name"], "Alice")
+        self.assertEqual(response.json["last_name"], "Smith")
+        self.assertEqual(response.json["email"], "alice.smith@example.com")
+        self.assertIn("id_user", response.json)
+
+        self.user_id = response.json["id_user"]
+```
+## Lancer les test 
+```bash
+pytest app/tests/
+```
 ## Lancer l’application
 
-```bash
-python3 run.py
-```
+ ```bash 
+ python3 run.py 
+ ``` 
+---
+
+# API
+
 L'API est disponible à l'adresse 'http://127.0.0.1:5000'.
+
+---
 
 # Authors
 Wassef Abdallah
