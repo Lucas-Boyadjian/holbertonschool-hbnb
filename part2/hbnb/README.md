@@ -146,7 +146,7 @@ def test_create_user(self):
 
         self.user_id = response.json["id_user"]
 ```
-## Lancer les test 
+## Lancer les tests
 ```bash
 pytest app/tests/
 ```
