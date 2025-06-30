@@ -2,6 +2,7 @@ from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app import bcrypt
 import re
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 api = Namespace('users', description='User operations')
@@ -68,6 +69,7 @@ class UserRessource(Resource):
     @api.response(404, "Not Found")
     @api.response(400, "Bad Request")
     @api.expect(user_model, validate=True)
+    @jwt_required()
     def put(self, user_id):
         """Update the data of user"""
         user_data = api.payload
