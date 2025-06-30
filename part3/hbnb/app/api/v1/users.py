@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from app import bcrypt
 import re
 
 
@@ -31,12 +32,20 @@ class UserList(Resource):
             existing_user = facade.get_user_by_email(user_data['email'])
             if existing_user:
                 return {'error': 'Email already registered'}, 400
+            
             if not is_valid_email(user_data["email"]):
                 return {"error": "Invalid email"}, 400
+            
+            hashed_password = bcrypt.generate_password_hash(
+                user_data['password']).decode('utf-8')
+            user_data['password'] = hashed_password
+            
             new_user = facade.create_user(user_data)
-            return new_user.to_dict(), 201
+            return {"id": new_user.id, "message": "User successfully created"}, 201
+        
         except ValueError as e:
             return {"error": "Invalid input data"}, 400
+        
     @api.response(200, "OK")
     def get(self):
         """Get a list of user"""
@@ -54,6 +63,7 @@ class UserRessource(Resource):
         if not user:
             return {"error": "User not found"}, 404
         return user.to_dict(), 200
+    
     @api.response(200, "OK")
     @api.response(404, "Not Found")
     @api.response(400, "Bad Request")
