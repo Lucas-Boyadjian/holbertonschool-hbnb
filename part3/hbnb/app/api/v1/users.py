@@ -80,7 +80,7 @@ class UserRessource(Resource):
         user_data = api.payload
 
         if "email" in user_data or "password" in user_data:
-            return {"error": "You cannot change your email address or password by this endpoint"}, 400
+            return {"error": "You cannot modify email or password"}, 400
         try:
             updated_user = facade.put_user(user_id, user_data)
             if not updated_user:

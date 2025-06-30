@@ -32,11 +32,11 @@ class ReviewList(Resource):
             place = facade.get_place(review_data['place_id'])
 
             if place.owner.id == current_user_id:
-                return {'error': 'You cannot review your own place.'}, 400
+                return {'error': 'You cannot review your own place'}, 400
 
             for review in place.reviews:
                 if review.user.id == current_user_id:
-                    return {'error': 'You have already reviewed this place.'}, 400
+                    return {'error': 'You have already reviewed this place'}, 400
 
             review_data['user_id'] = current_user_id
 
