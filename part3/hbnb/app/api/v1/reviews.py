@@ -26,8 +26,20 @@ class ReviewList(Resource):
     @jwt_required()
     def post(self):
         """Register a new review."""
+        current_user_id = get_jwt_identity()
         try:
             review_data = request.json
+            place = facade.get_place(review_data['place_id'])
+
+            if place.owner.id == current_user_id:
+                return {'error': 'You cannot review your own place.'}, 400
+
+            for review in place.reviews:
+                if review.user.id == current_user_id:
+                    return {'error': 'You have already reviewed this place.'}, 400
+
+            review_data['user_id'] = current_user_id
+
             new_review = facade.create_review(review_data)
 
             return {
@@ -37,11 +49,11 @@ class ReviewList(Resource):
                 'user_id': new_review.user.id,
                 'place_id': new_review.place.id
             }, 201
-
+                    
         except ValueError as e:
             return {'error': str(e)}, 400
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
     @api.response(200, 'List of reviews retrieved successfully')
     def get(self):
@@ -59,7 +71,7 @@ class ReviewList(Resource):
             ], 200
 
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
 
 @api.route('/<review_id>')
@@ -85,7 +97,7 @@ class ReviewResource(Resource):
             }, 200
 
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
     @api.expect(review_model)
     @api.response(200, 'Review updated successfully')
@@ -94,6 +106,11 @@ class ReviewResource(Resource):
     @jwt_required()
     def put(self, review_id):
         """Update a review's information."""
+        current_user_id = get_jwt_identity()
+        review = facade.get_review(review_id)
+        if review.user.id != current_user_id:
+            return {'error': 'Unauthorized action'}, 403
+
         try:
             review_data = request.json
 
@@ -111,13 +128,18 @@ class ReviewResource(Resource):
         except ValueError as e:
             return {'error': str(e)}, 400
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
     @api.response(200, 'Review deleted successfully')
     @api.response(404, 'Review not found')
     @jwt_required()
     def delete(self, review_id):
         """Delete a review."""
+        current_user_id = get_jwt_identity()
+        review = facade.get_review(review_id)
+        if review.user.id != current_user_id:
+            return {'error': 'Unauthorized action'}, 403
+        
         try:
             try:
                 facade.get_review(review_id)
@@ -131,7 +153,7 @@ class ReviewResource(Resource):
             }, 200
 
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
 
 @api.route('/places/<place_id>/reviews')
@@ -158,4 +180,4 @@ class PlaceReviewList(Resource):
             ], 200
 
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500

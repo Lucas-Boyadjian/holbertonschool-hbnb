@@ -72,9 +72,15 @@ class UserRessource(Resource):
     @jwt_required()
     def put(self, user_id):
         """Update the data of user"""
+        current_user_id = get_jwt_identity()
+
+        if str(current_user_id) != str(user_id):
+            return {"error": "Unauthorized action"}, 403
+
         user_data = api.payload
-        if not is_valid_email(user_data["email"]):
-            return {"error": "Invalid email"}, 400
+
+        if "email" in user_data or "password" in user_data:
+            return {"error": "You cannot change your email address or password by this endpoint"}, 400
         try:
             updated_user = facade.put_user(user_id, user_data)
             if not updated_user:
