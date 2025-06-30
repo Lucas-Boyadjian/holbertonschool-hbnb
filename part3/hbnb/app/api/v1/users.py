@@ -2,6 +2,7 @@ from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app import bcrypt
 import re
+from flask_jwt_extended import jwt_required
 
 
 api = Namespace('users', description='User operations')
@@ -24,6 +25,7 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
         """Register a new user"""
         try:
@@ -68,6 +70,7 @@ class UserRessource(Resource):
     @api.response(404, "Not Found")
     @api.response(400, "Bad Request")
     @api.expect(user_model, validate=True)
+    @jwt_required()
     def put(self, user_id):
         """Update the data of user"""
         user_data = api.payload
