@@ -57,13 +57,15 @@ class PlaceList(Resource):
     @jwt_required()
     def post(self):
         """Register a new place."""
+        current_user_id = get_jwt_identity()
         try:
             place_data = request.json
 
             if ('amenities' not in place_data or
                     place_data['amenities'] is None):
                 place_data['amenities'] = []
-
+                
+            place_data['owner_id'] = current_user_id
             new_place = facade.create_place(place_data)
 
             response = {
@@ -176,6 +178,7 @@ class PlaceResource(Resource):
     @jwt_required()
     def put(self, place_id):
         """Update a place's information."""
+        current_user_id = get_jwt_identity()
         try:
             place_data = request.json
 
@@ -183,12 +186,13 @@ class PlaceResource(Resource):
                 place = facade.get_place(place_id)
             except KeyError:
                 return {'error': 'Place not found'}, 404
-
+            
+            if place.owner.id != current_user_id:
+                return {'error': 'Unauthorized action'}, 403
+            
             facade.update_place(place_id, place_data)
 
-            return {
-                'message': 'Place updated successfully'
-            }, 200
+            return {'message': 'Place updated successfully'}, 200
 
         except ValueError as e:
             return {'error': str(e)}, 400
