@@ -6,10 +6,8 @@ import uuid
 from datetime import datetime
 from flask import Flask
 from sqlalchemy import Column, String, DateTime
-from sqlalchemy.orm import backref
 
-
-class BaseModel:
+class BaseModel(db.Model):
     """Base class for all models.
 
     Provides common attributes/methods for other classes:
