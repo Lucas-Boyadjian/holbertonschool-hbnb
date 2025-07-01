@@ -21,22 +21,22 @@ class User(BaseModel):
     reviews = relationship('Review', backref='user', lazy=True)
     
     @validates('first_name')
-    def validate_first_name(self, value):
+    def validate_first_name(self, key, value):
         if not value or len(value) > 50:
             raise ValueError("Invalid first name")
-        self._first_name = value
+        return value
     
     @validates('last_name')
-    def validate_last_name(self, value):
+    def validate_last_name(self, key, value):
         if not value or len(value) > 50:
             raise ValueError("Invalid last name")
-        self._last_name = value
+        return value
 
     @validates('email')
-    def validate_email(self, value):
+    def validate_email(self, key, value):
         if not value or '@' not in value:
             raise ValueError("Invalid email")
-        self._email = value
+        return value
 
     def add_place(self, place):
         self.places.append(place)
