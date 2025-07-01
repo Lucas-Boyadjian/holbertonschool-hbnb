@@ -2,6 +2,9 @@
 """Review model for HolbertonBnB application."""
 
 from .basemodel import BaseModel
+from app import db, bcrypt
+import uuid
+from sqlalchemy.orm import validates
 
 
 class Review(BaseModel):
@@ -13,31 +16,14 @@ class Review(BaseModel):
         place (Place): Place being reviewed
         user (User): User who wrote the review
     """
+    __tablename__ = 'reviews'
 
-    def __init__(self, text, rating, place, user):
-        """Initialize a new Review.
+    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+    text = db.Column(db.String(), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
 
-        Args:
-            text (str): Content of the review
-            rating (int): Rating given (1-5 stars)
-            place (Place): Place being reviewed
-            user (User): User who wrote the review
 
-        Raises:
-            ValueError: If any parameters are invalid
-        """
-        super().__init__()
-        self.text = text
-        self.rating = rating
-        self.place = place
-        self.user = user
-
-    @property
-    def text(self):
-        """Get the review text."""
-        return self._text
-
-    @text.setter
+    @validates('text')
     def text(self, value):
         """Set the review text.
 
@@ -51,12 +37,8 @@ class Review(BaseModel):
             raise ValueError("Invalid text")
         self._text = value
 
-    @property
-    def rating(self):
-        """Get the review rating."""
-        return self._rating
-
-    @rating.setter
+    
+    @validates('rating')
     def rating(self, value):
         """Set the review rating.
 
@@ -70,12 +52,8 @@ class Review(BaseModel):
             raise ValueError("Invalid rating")
         self._rating = value
 
-    @property
-    def place(self):
-        """Get the place being reviewed."""
-        return self._place
-
-    @place.setter
+    
+    @validates('place')
     def place(self, value):
         """Set the place being reviewed.
 
@@ -89,12 +67,8 @@ class Review(BaseModel):
             raise ValueError("Invalid place")
         self._place = value
 
-    @property
-    def user(self):
-        """Get the user who wrote the review."""
-        return self._user
-
-    @user.setter
+    
+    @validates('user')
     def user(self, value):
         """Set the user who wrote the review.
 

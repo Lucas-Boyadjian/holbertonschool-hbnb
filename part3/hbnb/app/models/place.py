@@ -2,6 +2,9 @@
 """Place model for HolbertonBnB application."""
 
 from .basemodel import BaseModel
+from app import db, bcrypt
+import uuid
+from sqlalchemy.orm import validates
 
 
 class Place(BaseModel):
@@ -17,33 +20,14 @@ class Place(BaseModel):
         reviews (list): List of Review objects for this place
         amenities (list): List of Amenity objects for this place
     """
+    __tablename__ = 'places'
 
-    def __init__(self, title, description, price, latitude, longitude, owner):
-        """Initialize a new Place.
-
-        Args:
-            title (str): The name/title of the place
-            description (str): Description of the place
-            price (float): Cost per night
-            latitude (float): Geographic latitude
-            longitude (float): Geographic longitude
-            owner (User): User who owns the place
-
-        Raises:
-            ValueError: If any parameters are invalid
-        """
-        super().__init__()
-        if not owner:
-            raise ValueError("Invalid owner")
-
-        self.title = title
-        self.description = description
-        self.price = price
-        self.latitude = latitude
-        self.longitude = longitude
-        self.owner = owner
-        self.reviews = []
-        self.amenities = []
+    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String())
+    price = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
 
     def add_review(self, review):
         """Add a review to the place."""
@@ -53,13 +37,8 @@ class Place(BaseModel):
         """Add an amenity to the place."""
         self.amenities.append(amenity)
 
-    @property
-    def title(self):
-        """Get the title of the place."""
-        return self._title
-
-    @title.setter
-    def title(self, value):
+    @validates('title')
+    def title(self, key, value):
         """Set the title of the place.
 
         Args:
@@ -74,12 +53,8 @@ class Place(BaseModel):
             raise ValueError("Title must be 100 characters max.")
         self._title = value
 
-    @property
-    def price(self):
-        """Get the price per night."""
-        return self._price
 
-    @price.setter
+    @validates('price')
     def price(self, value):
         """Set the price per night.
 
@@ -99,12 +74,8 @@ class Place(BaseModel):
             raise ValueError("Price cannot be negative")
         self._price = price_float
 
-    @property
-    def latitude(self):
-        """Get the geographic latitude."""
-        return self._latitude
-
-    @latitude.setter
+    
+    @validates('latitude')
     def latitude(self, value):
         """Set the geographic latitude.
 
@@ -124,12 +95,8 @@ class Place(BaseModel):
             raise ValueError("Latitude must be between -90.0 and 90.0")
         self._latitude = latitude_float
 
-    @property
-    def longitude(self):
-        """Get the geographic longitude."""
-        return self._longitude
-
-    @longitude.setter
+   
+    @validates('longitude')
     def longitude(self, value):
         """Set the geographic longitude.
 
