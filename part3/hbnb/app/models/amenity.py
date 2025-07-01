@@ -4,14 +4,14 @@ from .basemodel import BaseModel
 from app import db, bcrypt
 import uuid
 from sqlalchemy.orm import validates, relationship
-from sqlalchemy import ForeignKey, Column, Integer, Float, String, backref, Table
+from sqlalchemy import Column, String
+from app.models.place import place_amenity
 
 class Amenity(BaseModel):
 
     __tablename__ = 'amenities'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-    name = db.Column(db.String(50), nullable=False)
+    name = Column(String(50), nullable=False)
 
     @validates('name')
     def name(self, key, value):

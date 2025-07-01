@@ -4,8 +4,8 @@
 from .basemodel import BaseModel
 from app import db, bcrypt
 import uuid
-from sqlalchemy.orm import validates, relationship
-from sqlalchemy import ForeignKey, Column, Integer, Float, String, backref
+from sqlalchemy.orm import validates, relationship, backref
+from sqlalchemy import ForeignKey, Column, Integer, String
 
 class Review(BaseModel):
     """Represents a review for a place.
@@ -18,7 +18,6 @@ class Review(BaseModel):
     """
     __tablename__ = 'reviews'
 
-    id = Column(Integer, primary_key=True, nullable=False, unique=True)
     text = Column(String(), nullable=False)
     rating = Column(Integer, nullable=False)
     place_id = Column(Integer, ForeignKey('places.id'), nullable=False)

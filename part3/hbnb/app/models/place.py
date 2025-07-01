@@ -4,13 +4,15 @@
 from .basemodel import BaseModel
 from app import db, bcrypt
 import uuid
-from sqlalchemy.orm import validates, relationship
-from sqlalchemy import ForeignKey, Column, Integer, Float, String, backref, Table
+from sqlalchemy.orm import validates, relationship, backref
+from sqlalchemy import ForeignKey, Column, Integer, Float, String, Table
 
-place_amenity = Table('place_amenity',
-    Column('place_id', Integer, ForeignKey('places.id'), primary_key=True),
-    Column('amenity_id', Integer, ForeignKey('amenities.id'), primary_key=True)
+place_amenity = db.Table(
+    'place_amenity',
+    db.Column('place_id', db.Integer, db.ForeignKey('places.id'), primary_key=True),
+    db.Column('amenity_id', db.Integer, db.ForeignKey('amenities.id'), primary_key=True)
 )
+
 class Place(BaseModel):
     """Represents a rental property in the application.
 
@@ -26,7 +28,6 @@ class Place(BaseModel):
     """
     __tablename__ = 'places'
 
-    id = Column(Integer, primary_key=True, nullable=False, unique=True)
     title = Column(String(100), nullable=False)
     description = Column(String())
     price = Column(Float, nullable=False)
