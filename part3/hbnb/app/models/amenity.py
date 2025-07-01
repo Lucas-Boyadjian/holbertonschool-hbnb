@@ -14,10 +14,10 @@ class Amenity(BaseModel):
 
 
     @validates('name')
-    def name(self, value):
+    def name(self, key, value):
         if not value or len(value) > 50:
             raise ValueError("invalid name")
-        self._name = value    
+        return value    
     def to_dict(self,):
         return {
             "id": self.id,
