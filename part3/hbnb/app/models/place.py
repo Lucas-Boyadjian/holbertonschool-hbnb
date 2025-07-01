@@ -2,12 +2,15 @@
 """Place model for HolbertonBnB application."""
 
 from .basemodel import BaseModel
-from app import db, bcrypt, Column, Integer, Float, String, relationship, backref
+from app import db, bcrypt
 import uuid
-from sqlalchemy.orm import validates
-from sqlalchemy import ForeignKey
+from sqlalchemy.orm import validates, relationship
+from sqlalchemy import ForeignKey, Column, Integer, Float, String, backref, Table
 
-
+place_amenity = Table('place_amenity',
+    Column('place_id', Integer, ForeignKey('places.id'), primary_key=True),
+    Column('amenity_id', Integer, ForeignKey('amenities.id'), primary_key=True)
+)
 class Place(BaseModel):
     """Represents a rental property in the application.
 
@@ -30,10 +33,9 @@ class Place(BaseModel):
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    reviews = relationship('Review', backref='place', lazy=True)
+    amenities = relationship('Amenity', secondary=place_amenity, lazy='subquery', backref=backref('places', lazy=True))
     
-
-    amenities = relationship()
-
     def add_review(self, review):
         """Add a review to the place."""
         self.reviews.append(review)

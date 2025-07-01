@@ -3,7 +3,8 @@
 from .basemodel import BaseModel
 from app import db, bcrypt
 import uuid
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship
+from sqlalchemy import ForeignKey, Column, Integer, Float, String, backref, Table
 
 class Amenity(BaseModel):
 
@@ -11,7 +12,6 @@ class Amenity(BaseModel):
 
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
     name = db.Column(db.String(50), nullable=False)
-
 
     @validates('name')
     def name(self, key, value):

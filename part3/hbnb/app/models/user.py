@@ -2,20 +2,23 @@
 
 from app import db, bcrypt
 import uuid
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship
 from .basemodel import BaseModel
 from flask_bcrypt import Bcrypt
+from sqlalchemy import ForeignKey, Column, Integer, Float, String, backref, Boolean
 
 bcrypt = Bcrypt()
 
 class User(BaseModel):
     __tablename__ = 'users'
     
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(120), nullable=False, unique=True)
-    password = db.Column(db.String(128), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
+    first_name = Column(String(50), nullable=False)
+    last_name = Column(String(50), nullable=False)
+    email = Column(String(120), nullable=False, unique=True)
+    password = Column(String(128), nullable=False)
+    is_admin = Column(Boolean, default=False)
+    places = relationship('Place', backref='user', lazy=True)
+    reviews = relationship('Review', backref='user', lazy=True)
     
     @validates('first_name')
     def validate_first_name(self, value):
