@@ -9,21 +9,21 @@ import uuid
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repository = SQLAlchemyRepository(User)  # Switched to SQLAlchemyRepository
-        self.place_repository = SQLAlchemyRepository(Place)
-        self.review_repository = SQLAlchemyRepository(Review)
-        self.amenity_repository = SQLAlchemyRepository(Amenity)
+        self.user_repo = SQLAlchemyRepository(User)  # Switched to SQLAlchemyRepository
+        self.place_repo = SQLAlchemyRepository(Place)
+        self.review_repo = SQLAlchemyRepository(Review)
+        self.amenity_repo = SQLAlchemyRepository(Amenity)
 
     def create_user(self, user_data):
         user = User(**user_data)
-        self.user_repository.add(user)
+        self.user_repo.add(user)
         return user
 
     def get_user_by_id(self, user_id):
-        return self.user_repository.get(user_id)
+        return self.user_repo.get(user_id)
 
     def get_all_users(self):
-        return self.user_repository.get_all()
+        return self.user_repo.get_all()
     
     def put_user(self, user_id, data):
         user = self.user_repo.get(user_id)
@@ -138,7 +138,7 @@ class HBnBFacade:
         required_fields = ['text', 'rating', 'user_id', 'place_id']
         for field in required_fields:
             if field not in review_data:
-                raise ValueError(f"Missing required field: {field}")
+                raise ValueError("Missing required field: {}".format(field))
     
         rating = review_data['rating']
         if not isinstance(rating, int) or not (1 <= rating <= 5):
@@ -146,11 +146,11 @@ class HBnBFacade:
     
         user = self.user_repo.get(review_data['user_id'])
         if user is None:
-            raise ValueError(f"User with id {review_data['user_id']} does not exist.")
+            raise ValueError("User with id {} does not exist.".format(review_data['user_id']))
     
         place = self.place_repo.get(review_data['place_id'])
         if place is None:
-            raise ValueError(f"Place with id {review_data['place_id']} does not exist.")
+            raise ValueError("Place with id {} does not exist.".format(review_data['place_id']))
     
         from app.models.review import Review
         new_review = Review(
