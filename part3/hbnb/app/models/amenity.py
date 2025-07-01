@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 
 from .basemodel import BaseModel
+from app import db, bcrypt
+import uuid
+from sqlalchemy.orm import validates
 
 class Amenity(BaseModel):
-    def __init__(self, name):
-        super().__init__()
-        self.name = name
-    @property
-    def name(self):
-        return self._name
-    
-    @name.setter
+
+    __tablename__ = 'amenities'
+
+    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
+    name = db.Column(db.String(50), nullable=False)
+
+
+    @validates('name')
     def name(self, value):
         if not value or len(value) > 50:
             raise ValueError("invalid name")
