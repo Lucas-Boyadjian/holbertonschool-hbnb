@@ -5,22 +5,27 @@ from app.models.place import Place
 from app.models.user import User
 from app.models.amenity import Amenity
 from app.models.review import Review
+from app.services.repositories.user_repository import UserRepository
 import uuid
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = SQLAlchemyRepository(User)  # Switched to SQLAlchemyRepository
+        self.user_repo = UserRepository()
         self.place_repo = SQLAlchemyRepository(Place)
         self.review_repo = SQLAlchemyRepository(Review)
         self.amenity_repo = SQLAlchemyRepository(Amenity)
 
     def create_user(self, user_data):
         user = User(**user_data)
+        user.hash_password(user_data['password'])
         self.user_repo.add(user)
         return user
 
     def get_user_by_id(self, user_id):
         return self.user_repo.get(user_id)
+    
+    def get_user_by_email(self, email):
+        return self.user_repo.get_user_by_email(email)
 
     def get_all_users(self):
         return self.user_repo.get_all()
