@@ -2,9 +2,10 @@
 """Place model for HolbertonBnB application."""
 
 from .basemodel import BaseModel
-from app import db, bcrypt
+from app import db, bcrypt, Column, Integer, Float, String, relationship, backref
 import uuid
 from sqlalchemy.orm import validates
+from sqlalchemy import ForeignKey
 
 
 class Place(BaseModel):
@@ -22,12 +23,16 @@ class Place(BaseModel):
     """
     __tablename__ = 'places'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-    title = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String())
-    price = db.Column(db.Float, nullable=False)
-    latitude = db.Column(db.Float, nullable=False)
-    longitude = db.Column(db.Float, nullable=False)
+    id = Column(Integer, primary_key=True, nullable=False, unique=True)
+    title = Column(String(100), nullable=False)
+    description = Column(String())
+    price = Column(Float, nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    
+
+    amenities = relationship()
 
     def add_review(self, review):
         """Add a review to the place."""
