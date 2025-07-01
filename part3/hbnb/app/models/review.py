@@ -24,7 +24,7 @@ class Review(BaseModel):
 
 
     @validates('text')
-    def text(self, value):
+    def text(self, key, value):
         """Set the review text.
 
         Args:
@@ -35,11 +35,11 @@ class Review(BaseModel):
         """
         if not value:
             raise ValueError("Invalid text")
-        self._text = value
+        return value
 
     
     @validates('rating')
-    def rating(self, value):
+    def rating(self, key, value):
         """Set the review rating.
 
         Args:
@@ -50,11 +50,11 @@ class Review(BaseModel):
         """
         if not isinstance(value, int) or not (1 <= value <= 5):
             raise ValueError("Invalid rating")
-        self._rating = value
+        return value
 
     
     @validates('place')
-    def place(self, value):
+    def place(self, key, value):
         """Set the place being reviewed.
 
         Args:
@@ -65,11 +65,11 @@ class Review(BaseModel):
         """
         if not value:
             raise ValueError("Invalid place")
-        self._place = value
+        return value
 
     
     @validates('user')
-    def user(self, value):
+    def user(self, key, value):
         """Set the user who wrote the review.
 
         Args:
@@ -80,4 +80,4 @@ class Review(BaseModel):
         """
         if not value:
             raise ValueError("Invalid user")
-        self._user = value
+        return value
