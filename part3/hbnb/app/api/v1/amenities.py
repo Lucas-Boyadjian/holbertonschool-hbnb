@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 api = Namespace('amenities', description='Amenity operations')
 
@@ -59,3 +59,38 @@ class AmenityResource(Resource):
         except ValueError as e:
             api.abort(400, str(e))
         return updated_amenity.to_dict(), 200
+@api.route('/amenities/')
+class AdminAmenityCreate(Resource):
+    @jwt_required()
+    def post(self):
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+        data_amenity = api.payload
+        try:
+            new_amenity = facade.create_amenity(data_amenity)
+        except ValueError as e:
+            return{"error": str(e)},400
+        return{"id":new_amenity.id,"name":new_amenity.name},201
+
+@api.route('/amenities/<amenity_id>')
+class AdminAmenityModify(Resource):
+    @jwt_required()
+    def put(self, amenity_id):
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+
+        data_amenity = api.payload
+
+        amenity = facade.get_amenity(amenity_id)
+        if amenity is None:
+            return {'error': 'Amenity not found'}, 404
+
+        try:
+            updated_amenity = facade.update_amenity(amenity_id, data_amenity)
+        except ValueError as e:
+            return {'error': str(e)}, 400
+
+        return updated_amenity.to_dict(), 200
+    
