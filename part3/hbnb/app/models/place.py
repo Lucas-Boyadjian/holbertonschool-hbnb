@@ -2,7 +2,16 @@
 """Place model for HolbertonBnB application."""
 
 from .basemodel import BaseModel
+from app import db, bcrypt
+import uuid
+from sqlalchemy.orm import validates, relationship, backref
+from sqlalchemy import ForeignKey, Column, Integer, Float, String, Table
 
+place_amenity = db.Table(
+    'place_amenity',
+    db.Column('place_id', db.Integer, db.ForeignKey('places.id'), primary_key=True),
+    db.Column('amenity_id', db.Integer, db.ForeignKey('amenities.id'), primary_key=True)
+)
 
 class Place(BaseModel):
     """Represents a rental property in the application.
@@ -17,34 +26,17 @@ class Place(BaseModel):
         reviews (list): List of Review objects for this place
         amenities (list): List of Amenity objects for this place
     """
+    __tablename__ = 'places'
 
-    def __init__(self, title, description, price, latitude, longitude, owner):
-        """Initialize a new Place.
-
-        Args:
-            title (str): The name/title of the place
-            description (str): Description of the place
-            price (float): Cost per night
-            latitude (float): Geographic latitude
-            longitude (float): Geographic longitude
-            owner (User): User who owns the place
-
-        Raises:
-            ValueError: If any parameters are invalid
-        """
-        super().__init__()
-        if not owner:
-            raise ValueError("Invalid owner")
-
-        self.title = title
-        self.description = description
-        self.price = price
-        self.latitude = latitude
-        self.longitude = longitude
-        self.owner = owner
-        self.reviews = []
-        self.amenities = []
-
+    title = Column(String(100), nullable=False)
+    description = Column(String())
+    price = Column(Float, nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    reviews = relationship('Review', backref='place', lazy=True)
+    amenities = relationship('Amenity', secondary=place_amenity, lazy='subquery', backref=backref('places', lazy=True))
+    
     def add_review(self, review):
         """Add a review to the place."""
         self.reviews.append(review)
@@ -53,13 +45,8 @@ class Place(BaseModel):
         """Add an amenity to the place."""
         self.amenities.append(amenity)
 
-    @property
-    def title(self):
-        """Get the title of the place."""
-        return self._title
-
-    @title.setter
-    def title(self, value):
+    @validates('title')
+    def title(self, key, value):
         """Set the title of the place.
 
         Args:
@@ -72,15 +59,11 @@ class Place(BaseModel):
             raise ValueError("Title cannot be None.")
         if len(value) > 100:
             raise ValueError("Title must be 100 characters max.")
-        self._title = value
+        return value
 
-    @property
-    def price(self):
-        """Get the price per night."""
-        return self._price
 
-    @price.setter
-    def price(self, value):
+    @validates('price')
+    def price(self, key, value):
         """Set the price per night.
 
         Args:
@@ -97,15 +80,11 @@ class Place(BaseModel):
             raise ValueError("Price must be a valid number")
         if price_float < 0:
             raise ValueError("Price cannot be negative")
-        self._price = price_float
+        return price_float
 
-    @property
-    def latitude(self):
-        """Get the geographic latitude."""
-        return self._latitude
-
-    @latitude.setter
-    def latitude(self, value):
+    
+    @validates('latitude')
+    def latitude(self, key, value):
         """Set the geographic latitude.
 
         Args:
@@ -122,15 +101,11 @@ class Place(BaseModel):
             raise ValueError("Latitude must be a valid number")
         if not (-90.0 <= latitude_float <= 90.0):
             raise ValueError("Latitude must be between -90.0 and 90.0")
-        self._latitude = latitude_float
+        return latitude_float
 
-    @property
-    def longitude(self):
-        """Get the geographic longitude."""
-        return self._longitude
-
-    @longitude.setter
-    def longitude(self, value):
+   
+    @validates('longitude')
+    def longitude(self, key, value):
         """Set the geographic longitude.
 
         Args:
@@ -147,4 +122,4 @@ class Place(BaseModel):
             raise ValueError("Longitude must be a valid number")
         if not (-180.0 <= longitude_float <= 180.0):
             raise ValueError("Longitude must be between -180.0 and 180.0")
-        self._longitude = longitude_float
+        return longitude_float

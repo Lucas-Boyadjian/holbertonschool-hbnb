@@ -1,49 +1,42 @@
 #!/usr/bin/env python3
 
+from app import db, bcrypt
+import uuid
+from sqlalchemy.orm import validates, relationship, backref
 from .basemodel import BaseModel
 from flask_bcrypt import Bcrypt
+from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean
 
 bcrypt = Bcrypt()
 
 class User(BaseModel):
-    def __init__(self, first_name, last_name, email, hash_password, is_admin=False):
-        super().__init__()
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self.is_admin = is_admin
-        self.places = []
-        self.password = hash_password
-
-    @property
-    def first_name(self):
-        return self._first_name
+    __tablename__ = 'users'
     
-    @first_name.setter
-    def first_name(self, value):
+    first_name = Column(String(50), nullable=False)
+    last_name = Column(String(50), nullable=False)
+    email = Column(String(120), nullable=False, unique=True)
+    password = Column(String(128), nullable=False)
+    is_admin = Column(Boolean, default=False)
+    places = relationship('Place', backref='user', lazy=True)
+    reviews = relationship('Review', backref='user', lazy=True)
+    
+    @validates('first_name')
+    def validate_first_name(self, key, value):
         if not value or len(value) > 50:
             raise ValueError("Invalid first name")
-        self._first_name = value
-
-    @property
-    def last_name(self):
-        return self._last_name
+        return value
     
-    @last_name.setter
-    def last_name(self, value):
+    @validates('last_name')
+    def validate_last_name(self, key, value):
         if not value or len(value) > 50:
             raise ValueError("Invalid last name")
-        self._last_name = value
+        return value
 
-    @property
-    def email(self):
-        return self._email
-    
-    @email.setter
-    def email(self, value):
+    @validates('email')
+    def validate_email(self, key, value):
         if not value or '@' not in value:
             raise ValueError("Invalid email")
-        self._email = value
+        return value
 
     def add_place(self, place):
         self.places.append(place)

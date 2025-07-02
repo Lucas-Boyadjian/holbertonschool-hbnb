@@ -2,7 +2,10 @@
 """Review model for HolbertonBnB application."""
 
 from .basemodel import BaseModel
-
+from app import db, bcrypt
+import uuid
+from sqlalchemy.orm import validates, relationship, backref
+from sqlalchemy import ForeignKey, Column, Integer, String
 
 class Review(BaseModel):
     """Represents a review for a place.
@@ -13,32 +16,16 @@ class Review(BaseModel):
         place (Place): Place being reviewed
         user (User): User who wrote the review
     """
+    __tablename__ = 'reviews'
 
-    def __init__(self, text, rating, place, user):
-        """Initialize a new Review.
+    text = Column(String(), nullable=False)
+    rating = Column(Integer, nullable=False)
+    place_id = Column(Integer, ForeignKey('places.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    
 
-        Args:
-            text (str): Content of the review
-            rating (int): Rating given (1-5 stars)
-            place (Place): Place being reviewed
-            user (User): User who wrote the review
-
-        Raises:
-            ValueError: If any parameters are invalid
-        """
-        super().__init__()
-        self.text = text
-        self.rating = rating
-        self.place = place
-        self.user = user
-
-    @property
-    def text(self):
-        """Get the review text."""
-        return self._text
-
-    @text.setter
-    def text(self, value):
+    @validates('text')
+    def text(self, key, value):
         """Set the review text.
 
         Args:
@@ -49,15 +36,11 @@ class Review(BaseModel):
         """
         if not value:
             raise ValueError("Invalid text")
-        self._text = value
+        return value
 
-    @property
-    def rating(self):
-        """Get the review rating."""
-        return self._rating
-
-    @rating.setter
-    def rating(self, value):
+    
+    @validates('rating')
+    def rating(self, key, value):
         """Set the review rating.
 
         Args:
@@ -68,15 +51,11 @@ class Review(BaseModel):
         """
         if not isinstance(value, int) or not (1 <= value <= 5):
             raise ValueError("Invalid rating")
-        self._rating = value
+        return value
 
-    @property
-    def place(self):
-        """Get the place being reviewed."""
-        return self._place
-
-    @place.setter
-    def place(self, value):
+    
+    @validates('place')
+    def place(self, key, value):
         """Set the place being reviewed.
 
         Args:
@@ -87,15 +66,11 @@ class Review(BaseModel):
         """
         if not value:
             raise ValueError("Invalid place")
-        self._place = value
+        return value
 
-    @property
-    def user(self):
-        """Get the user who wrote the review."""
-        return self._user
-
-    @user.setter
-    def user(self, value):
+    
+    @validates('user')
+    def user(self, key, value):
         """Set the user who wrote the review.
 
         Args:
@@ -106,4 +81,4 @@ class Review(BaseModel):
         """
         if not value:
             raise ValueError("Invalid user")
-        self._user = value
+        return value
