@@ -68,13 +68,13 @@ class UserRessource(Resource):
     @api.response(200, "OK")
     @api.response(404, "Not Found")
     @api.response(400, "Bad Request")
-    @api.expect(user_model, validate=True)
+    @api.expect(user_model)
     @jwt_required()
     def put(self, user_id):
         """Update the data of user"""
         current_user_id = get_jwt_identity()
 
-        if str(current_user_id) != str(user_id):
+        if str(current_user_id["id"]) != str(user_id):
             return {"error": "Unauthorized action"}, 403
 
         user_data = api.payload
