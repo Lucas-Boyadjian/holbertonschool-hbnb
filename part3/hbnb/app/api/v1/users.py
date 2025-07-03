@@ -2,10 +2,12 @@ from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app import bcrypt
 import re
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+from flask import request
 
 
 api = Namespace('users', description='User operations')
+api = Namespace('admin', description='Admin operations')
 
 # Define the user model for input validation and documentation
 user_model = api.model('User', {
@@ -91,3 +93,79 @@ class UserRessource(Resource):
         except Exception as e:
             print(e)
             return {"error": "Bad Request"}, 400
+@api.route('/users/<user_id>')
+class AdminUserResource(Resource):
+    @jwt_required()
+    def put(self, user_id):
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+
+        data = request.json
+        email = data.get('email')
+
+        if email:
+            existing_user = facade.get_user_by_email(email)
+            if existing_user and existing_user.id != user_id:
+                return {'error': 'Email is already in use'}, 400
+            if not is_valid_email(email):
+                return {'error': 'Invalid email'}, 400
+
+        if "password" in data:
+            hashed_password = bcrypt.generate_password_hash(
+                data['password']).decode('utf-8')
+            data['password'] = hashed_password
+
+        updated_user = facade.put_user(user_id, data)
+        if not updated_user:
+            return {"error": "User not found"}, 404
+        return updated_user.to_dict(), 200
+
+@api.route('/users/')
+class AdminUserCreate(Resource):
+    @jwt_required()
+    def post(self):
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+
+        user_data = request.json
+        email = user_data.get('email')
+
+        
+        if facade.get_user_by_email(email):
+            return {'error': 'Email already registered'}, 400
+        if not is_valid_email(email):
+            return {'error': 'Invalid email'}, 400
+        hashed_password = bcrypt.generate_password_hash(
+                user_data['password']).decode('utf-8')
+        user_data['password'] = hashed_password
+        new_user = facade.create_user(user_data)
+        return {"id":new_user.id, "message":"User successfully created"}, 201
+            
+
+@api.route('/users/<user_id>')
+class AdminUserModify(Resource):
+    @jwt_required()
+    def put(self, user_id):
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+
+        data = request.json
+        email = data.get('email')
+
+        # Ensure email uniqueness
+        if email:
+            existing_user = facade.get_user_by_email(email)
+            if existing_user and existing_user.id != user_id:
+                return {'error': 'Email already in use'}, 400
+              
+            if not is_valid_email(email):
+                return {'error': 'Invalid email'}, 400
+            if "password" in data:
+                hashed_password = bcrypt.generate_password_hash(
+                data['password']).decode('utf-8')
+                data['password'] = hashed_password
+        updated_user = facade.put_user(user_id, data)
+        return updated_user.to_dict(), 200
