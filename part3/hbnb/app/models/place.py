@@ -33,7 +33,7 @@ class Place(BaseModel):
     price = Column(Float, nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    owner_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     reviews = relationship('Review', backref='place', lazy=True)
     amenities = relationship('Amenity', secondary=place_amenity, lazy='subquery', backref=backref('places', lazy=True))
     
