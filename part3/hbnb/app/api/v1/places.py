@@ -54,6 +54,7 @@ class PlaceList(Resource):
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
+    @api.response(500, 'An unexpected error occurred')
     @jwt_required()
     def post(self):
         """Register a new place."""
@@ -179,31 +180,6 @@ class PlaceResource(Resource):
     @jwt_required()
     def put(self, place_id):
         """Update a place's information."""
-        current_user_id = get_jwt_identity()
-        try:
-            place_data = request.json
-
-            try:
-                place = facade.get_place(place_id)
-            except KeyError:
-                return {'error': 'Place not found'}, 404
-            
-            if place.owner.id != current_user_id:
-                return {'error': 'Unauthorized action'}, 403
-            
-            facade.update_place(place_id, place_data)
-
-            return {'message': 'Place updated successfully'}, 200
-
-        except ValueError as e:
-            return {'error': str(e)}, 400
-        except Exception as e:
-            return {'error': "An unexpected error occurred: {}"
-                    .format(str(e))}, 500
-@api.route('/places/<place_id>')
-class AdminPlaceModify(Resource):
-    @jwt_required()
-    def put(self, place_id):
         current_user = get_jwt_identity()
         is_admin = current_user.get('is_admin', False)
         user_id = current_user.get('id')
@@ -214,11 +190,12 @@ class AdminPlaceModify(Resource):
 
         if not is_admin and place.owner_id != user_id:
             return {'error': 'Unauthorized action'}, 403
-
+        
         place_data = request.json
         try:
             updated_place = facade.update_place(place_id, place_data)
+            return updated_place.to_dict(), 200
         except ValueError as e:
             return {'error': str(e)}, 400
-
-        return updated_place.to_dict(), 200
+        except Exception as e:
+            return {'error': 'An unexpected error occurred: {}'.format(str(e))}, 500

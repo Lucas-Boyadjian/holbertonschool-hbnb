@@ -29,7 +29,7 @@ class UserList(Resource):
     @api.response(409, 'Conflict')
     @jwt_required()
     def post(self):
-        """Créer un nouvel utilisateur (admin uniquement)"""
+        """Create a new user (admin only)"""
         current_user = get_jwt_identity()
 
         if not current_user.get('is_admin'):
