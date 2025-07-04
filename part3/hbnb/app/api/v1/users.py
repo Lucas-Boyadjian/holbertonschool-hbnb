@@ -24,7 +24,7 @@ def is_valid_email(email):
 class UserList(Resource):
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created')
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Bad request')
     @api.response(403, 'Aunauthorized action')
     @api.response(409, 'Conflict')
     @jwt_required()

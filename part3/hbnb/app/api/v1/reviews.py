@@ -48,7 +48,7 @@ class ReviewList(Resource):
         except ValueError as e:
             return {'error': str(e)}, 400
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
     @api.response(200, 'List of reviews retrieved successfully')
     @api.response(500, 'An unexpected error occurred')
@@ -65,7 +65,7 @@ class ReviewList(Resource):
                 for review in reviews
             ], 200
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
 @api.route('/<review_id>')
 class ReviewResource(Resource):
@@ -86,11 +86,11 @@ class ReviewResource(Resource):
                 'place_id': review.place.id
             }, 200
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
     @api.expect(review_model)
     @api.response(200, 'Review updated successfully')
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Bad request')
     @api.response(403, 'Unauthorized action')
     @api.response(404, 'Not found')
     @api.response(500, 'An unexpected error occurred')
@@ -117,7 +117,7 @@ class ReviewResource(Resource):
             }, 200
 
         except ValueError as e:
-            return {'error': str(e)}, 400
+            return {"error": "Invalid input data: {}".format(str(e))}, 400
         except Exception as e:
             return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
@@ -177,6 +177,7 @@ class PlaceReviewList(Resource):
 @api.route('/<review_id>')
 class ReviewResource(Resource):
     @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(400, 'Bad request')
     @api.response(403, 'Unauthorized action')
     @api.response(404, 'Not found')
     @api.response(500, 'An unexpected error occurred')
@@ -197,11 +198,12 @@ class ReviewResource(Resource):
         try:
             updated_review = facade.update_review(review_id, review_data)
         except ValueError as e:
-            return {'error': str(e)}, 400
+             return {"error": "Invalid input data: {}".format(str(e))}, 400
 
         return updated_review.to_dict(), 200
     
     @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(400, 'Bad request')
     @api.response(403, 'Unauthorized action')
     @api.response(404, 'Not found')
     @jwt_required()
@@ -222,12 +224,13 @@ class ReviewResource(Resource):
             facade.delete_review(review_id)
             return {'message': 'Review deleted successfully'}, 200
         except Exception as e:
-            return {'error': str(e)}, 400
+             return {"error": "Invalid input data: {}".format(str(e))}, 400
 
 @api.route('/places/<place_id>/reviews')
 class PlaceReviewList(Resource):
     @api.response(200, 'List of reviews for the place retrieved successfully')
-    @api.response(404, 'Place not found')
+    @api.response(404, 'Not found')
+    @api.response(500, 'An unexpected error occurred')
     def get(self, place_id):
         """Get all reviews for a specific place."""
         try:
@@ -243,4 +246,4 @@ class PlaceReviewList(Resource):
         except KeyError:
             return {'error': 'Place not found'}, 404
         except Exception as e:
-            return {'error': f"An unexpected error occurred: {str(e)}"}, 500
+             return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
