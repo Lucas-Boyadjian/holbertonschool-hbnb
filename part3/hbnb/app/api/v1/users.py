@@ -25,30 +25,32 @@ def is_valid_email(email):
 class UserList(Resource):
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created')
-    @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
+    @api.response(403, 'Aunauthorized action')
+    @api.response(409, 'Conflict')
+    @jwt_required()
     def post(self):
-        """Register a new user"""
+        """Créer un nouvel utilisateur (admin uniquement)"""
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+
+        user_data = api.payload
+        if facade.get_user_by_email(user_data['email']):
+            return {'error': 'Email already registered'}, 409
+        if not is_valid_email(user_data["email"]):
+            return {"error": "Invalid email"}, 400
+
+        hashed_password = bcrypt.generate_password_hash(
+            user_data['password']).decode('utf-8')
+        user_data['password'] = hashed_password
+
         try:
-            user_data = api.payload
-            # Simulate email uniqueness check (to be replaced by real validation with persistence)
-            existing_user = facade.get_user_by_email(user_data['email'])
-            if existing_user:
-                return {'error': 'Email already registered'}, 400
-            
-            if not is_valid_email(user_data["email"]):
-                return {"error": "Invalid email"}, 400
-            
-            hashed_password = bcrypt.generate_password_hash(
-                user_data['password']).decode('utf-8')
-            user_data['password'] = hashed_password
-            
             new_user = facade.create_user(user_data)
             return {"id": new_user.id, "message": "User successfully created"}, 201
-        
-        except ValueError as e:
+        except ValueError:
             return {"error": "Invalid input data"}, 400
-        
+            
     @api.response(200, "OK")
     def get(self):
         """Get a list of user"""
@@ -59,7 +61,7 @@ class UserList(Resource):
 @api.route("/<user_id>")
 class UserRessource(Resource):
     @api.response(200, "User details retrieved successfully")
-    @api.response(404, "User not found")
+    @api.response(404, "Not found")
     def get(self, user_id):
         """Get user details by ID"""
         user = facade.get_user(user_id)
@@ -68,23 +70,41 @@ class UserRessource(Resource):
         return user.to_dict(), 200
     
     @api.response(200, "OK")
-    @api.response(404, "Not Found")
     @api.response(400, "Bad Request")
-    @api.expect(user_model)
+    @api.response(403, "Unauthorized action")
+    @api.response(404, "Not Found")
+    @api.response(409, "Conflict")
+    @api.expect(user_model, validate=True)
     @jwt_required()
     def put(self, user_id):
-        """Update the data of user"""
-        current_user_id = get_jwt_identity()
+        """Update the data of user (admin: tout, user: limité)"""
+        current_user = get_jwt_identity()
+        data = api.payload
 
-        if str(current_user_id["id"]) != str(user_id):
+        if current_user.get('is_admin'):
+            email = data.get('email')
+            if email:
+                existing_user = facade.get_user_by_email(email)
+                if not is_valid_email(email):
+                    return {'error': 'Invalid email'}, 400
+                if existing_user and str(existing_user.id) != str(user_id):
+                    return {'error': 'Email already in use'}, 409
+            if "password" in data:
+                hashed_password = bcrypt.generate_password_hash(
+                    data['password']).decode('utf-8')
+                data['password'] = hashed_password
+            updated_user = facade.put_user(user_id, data)
+            if not updated_user:
+                return {"error": "User not found"}, 404
+            return updated_user.to_dict(), 200
+
+        if str(current_user["id"]) != str(user_id):
             return {"error": "Unauthorized action"}, 403
 
-        user_data = api.payload
-
-        if "email" in user_data or "password" in user_data:
+        if "email" in data or "password" in data:
             return {"error": "You cannot modify email or password"}, 400
         try:
-            updated_user = facade.put_user(user_id, user_data)
+            updated_user = facade.put_user(user_id, data)
             if not updated_user:
                 return {"error": "User not found"}, 404
             return updated_user.to_dict(), 200
@@ -93,79 +113,3 @@ class UserRessource(Resource):
         except Exception as e:
             print(e)
             return {"error": "Bad Request"}, 400
-@api.route('/users/<user_id>')
-class AdminUserResource(Resource):
-    @jwt_required()
-    def put(self, user_id):
-        current_user = get_jwt_identity()
-        if not current_user.get('is_admin'):
-            return {'error': 'Admin privileges required'}, 403
-
-        data = request.json
-        email = data.get('email')
-
-        if email:
-            existing_user = facade.get_user_by_email(email)
-            if existing_user and existing_user.id != user_id:
-                return {'error': 'Email is already in use'}, 400
-            if not is_valid_email(email):
-                return {'error': 'Invalid email'}, 400
-
-        if "password" in data:
-            hashed_password = bcrypt.generate_password_hash(
-                data['password']).decode('utf-8')
-            data['password'] = hashed_password
-
-        updated_user = facade.put_user(user_id, data)
-        if not updated_user:
-            return {"error": "User not found"}, 404
-        return updated_user.to_dict(), 200
-
-@api.route('/users/')
-class AdminUserCreate(Resource):
-    @jwt_required()
-    def post(self):
-        current_user = get_jwt_identity()
-        if not current_user.get('is_admin'):
-            return {'error': 'Admin privileges required'}, 403
-
-        user_data = request.json
-        email = user_data.get('email')
-
-        
-        if facade.get_user_by_email(email):
-            return {'error': 'Email already registered'}, 400
-        if not is_valid_email(email):
-            return {'error': 'Invalid email'}, 400
-        hashed_password = bcrypt.generate_password_hash(
-                user_data['password']).decode('utf-8')
-        user_data['password'] = hashed_password
-        new_user = facade.create_user(user_data)
-        return {"id":new_user.id, "message":"User successfully created"}, 201
-            
-
-@api.route('/users/<user_id>')
-class AdminUserModify(Resource):
-    @jwt_required()
-    def put(self, user_id):
-        current_user = get_jwt_identity()
-        if not current_user.get('is_admin'):
-            return {'error': 'Admin privileges required'}, 403
-
-        data = request.json
-        email = data.get('email')
-
-        # Ensure email uniqueness
-        if email:
-            existing_user = facade.get_user_by_email(email)
-            if existing_user and existing_user.id != user_id:
-                return {'error': 'Email already in use'}, 400
-              
-            if not is_valid_email(email):
-                return {'error': 'Invalid email'}, 400
-            if "password" in data:
-                hashed_password = bcrypt.generate_password_hash(
-                data['password']).decode('utf-8')
-                data['password'] = hashed_password
-        updated_user = facade.put_user(user_id, data)
-        return updated_user.to_dict(), 200
