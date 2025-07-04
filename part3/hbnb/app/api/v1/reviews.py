@@ -22,7 +22,8 @@ class ReviewList(Resource):
 
     @api.expect(review_model)
     @api.response(201, 'Review successfully created')
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Bad Request')
+    @api.response(500, 'An unexpected error occurred')
     @jwt_required()
     def post(self):
         """Register a new review."""
@@ -56,6 +57,7 @@ class ReviewList(Resource):
             return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
     @api.response(200, 'List of reviews retrieved successfully')
+    @api.response(500, 'An unexpected error occurred')
     def get(self):
         """Retrieve a list of all reviews."""
         try:
@@ -79,7 +81,8 @@ class ReviewResource(Resource):
     """Resource for individual review operations."""
 
     @api.response(200, 'Review details retrieved successfully')
-    @api.response(404, 'Review not found')
+    @api.response(404, 'Not found')
+    @api.response(500, 'An unexpected error occurred')
     def get(self, review_id):
         """Get review details by ID."""
         try:
@@ -101,8 +104,10 @@ class ReviewResource(Resource):
 
     @api.expect(review_model)
     @api.response(200, 'Review updated successfully')
-    @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
+    @api.response(403, 'Unauthorized action')
+    @api.response(404, 'Not found')
+    @api.response(500, 'An unexpected error occurred')
     @jwt_required()
     def put(self, review_id):
         """Update a review's information."""
@@ -131,7 +136,8 @@ class ReviewResource(Resource):
             return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
     @api.response(200, 'Review deleted successfully')
-    @api.response(404, 'Review not found')
+    @api.response(403, 'Unauthorized action')
+    @api.response(404, 'Not found')
     @jwt_required()
     def delete(self, review_id):
         """Delete a review."""
@@ -161,7 +167,8 @@ class PlaceReviewList(Resource):
     """Resource for retrieving reviews by place."""
 
     @api.response(200, 'List of reviews for the place retrieved successfully')
-    @api.response(404, 'Place not found')
+    @api.response(404, 'Not found')
+    @api.response(500, 'An unexpected error occurred')
     def get(self, place_id):
         """Get all reviews for a specific place."""
         try:
@@ -183,6 +190,10 @@ class PlaceReviewList(Resource):
             return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 @api.route('/<review_id>')
 class ReviewResource(Resource):
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(403, 'Unauthorized action')
+    @api.response(404, 'Not found')
+    @api.response(500, 'An unexpected error occurred')
     @jwt_required()
     def put(self, review_id):
         current_user = get_jwt_identity()
@@ -203,7 +214,10 @@ class ReviewResource(Resource):
             return {'error': str(e)}, 400
 
         return updated_review.to_dict(), 200
-
+    
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(403, 'Unauthorized action')
+    @api.response(404, 'Not found')
     @jwt_required()
     def delete(self, review_id):
         current_user = get_jwt_identity()

@@ -13,7 +13,8 @@ amenity_model = api.model('Amenity', {
 class AmenityList(Resource):
     @api.expect(amenity_model, validate=True)
     @api.response(201, 'Amenity successfully created')
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Bad Request')
+    @api.response(403, 'Aunauthorized action')
     @jwt_required()
     def post(self):
         """Register a new amenity (admin only)"""
@@ -24,7 +25,7 @@ class AmenityList(Resource):
         try:
             new_amenity = facade.create_amenity(data_amenity)
         except ValueError as e:
-            return {"error": str(e)}, 400
+            return {"error": "Invalid input data: {}".format(str(e))}, 400
         return {"id": new_amenity.id, "name": new_amenity.name}, 201
 
     @api.response(200, 'List of amenities retrieved successfully')
@@ -36,7 +37,7 @@ class AmenityList(Resource):
 @api.route('/<amenity_id>')
 class AmenityResource(Resource):
     @api.response(200, 'Amenity details retrieved successfully')
-    @api.response(404, 'Amenity not found')
+    @api.response(404, 'Not found')
     def get(self, amenity_id):
         """Get amenity details by ID"""
         amenity = facade.get_amenity(amenity_id)
@@ -46,8 +47,9 @@ class AmenityResource(Resource):
 
     @api.expect(amenity_model, validate=True)
     @api.response(200, 'Amenity updated successfully')
-    @api.response(404, 'Amenity not found')
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Bad Request')
+    @api.response(403, 'Aunauthorized action')
+    @api.response(404, 'Not found')
     @jwt_required()
     def put(self, amenity_id):
         """Update an amenity's information (admin only)"""
@@ -61,5 +63,5 @@ class AmenityResource(Resource):
         try:
             updated_amenity = facade.update_amenity(amenity_id, data_amenity)
         except ValueError as e:
-            api.abort(400, str(e))
+            return {"error": "Invalid input data: {}".format(str(e))}, 400
         return updated_amenity.to_dict(), 200

@@ -53,7 +53,7 @@ class PlaceList(Resource):
 
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Bad Request')
     @api.response(500, 'An unexpected error occurred')
     @jwt_required()
     def post(self):
@@ -86,12 +86,13 @@ class PlaceList(Resource):
             return response, 201
 
         except ValueError as e:
-            return {'error': str(e)}, 400
+            return {"error": "Invalid input data: {}".format(str(e))}, 400
         except Exception as e:
             return {'error': "An unexpected error occurred: {}"
                     .format(str(e))}, 500
 
     @api.response(200, 'List of places retrieved successfully')
+    @api.response(500, 'An unexpected error occurred')
     def get(self):
         """Retrieve a list of all places."""
         try:
@@ -115,7 +116,8 @@ class PlaceResource(Resource):
     """Resource for individual place operations."""
 
     @api.response(200, 'Place details retrieved successfully')
-    @api.response(404, 'Place not found')
+    @api.response(404, 'Not found')
+    @api.response(500, 'An unexpected error occurred')
     def get(self, place_id):
         """Get place details by ID."""
         try:
@@ -174,9 +176,10 @@ class PlaceResource(Resource):
 
     @api.expect(place_model)
     @api.response(200, 'Place updated successfully')
+    @api.response(400, 'Bad Request')
     @api.response(403, 'Unauthorized action')
-    @api.response(404, 'Place not found')
-    @api.response(400, 'Invalid input data')
+    @api.response(404, 'Not found')
+    @api.response(500, 'An unexpected error occurred')
     @jwt_required()
     def put(self, place_id):
         """Update a place's information."""
@@ -196,6 +199,6 @@ class PlaceResource(Resource):
             updated_place = facade.update_place(place_id, place_data)
             return updated_place.to_dict(), 200
         except ValueError as e:
-            return {'error': str(e)}, 400
+            return {"error": "Invalid input data: {}".format(str(e))}, 400
         except Exception as e:
             return {'error': 'An unexpected error occurred: {}'.format(str(e))}, 500
