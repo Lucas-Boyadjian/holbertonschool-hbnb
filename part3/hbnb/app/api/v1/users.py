@@ -25,7 +25,7 @@ class UserList(Resource):
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created')
     @api.response(400, 'Bad request')
-    @api.response(403, 'Aunauthorized action')
+    @api.response(403, "Unauthorized action")
     @api.response(409, 'Conflict')
     @jwt_required()
     def post(self):
