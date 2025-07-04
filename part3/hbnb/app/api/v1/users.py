@@ -7,7 +7,6 @@ from flask import request
 
 
 api = Namespace('users', description='User operations')
-api = Namespace('admin', description='Admin operations')
 
 # Define the user model for input validation and documentation
 user_model = api.model('User', {
