@@ -32,10 +32,12 @@ class UserList(Resource):
     def post(self):
         """Créer un nouvel utilisateur (admin uniquement)"""
         current_user = get_jwt_identity()
+
         if not current_user.get('is_admin'):
             return {'error': 'Admin privileges required'}, 403
-
+        
         user_data = api.payload
+
         if facade.get_user_by_email(user_data['email']):
             return {'error': 'Email already registered'}, 409
         if not is_valid_email(user_data["email"]):
@@ -79,16 +81,17 @@ class UserRessource(Resource):
     def put(self, user_id):
         """Update the data of user (admin: tout, user: limité)"""
         current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+        
         data = api.payload
-
-        if current_user.get('is_admin'):
-            email = data.get('email')
-            if email:
-                existing_user = facade.get_user_by_email(email)
-                if not is_valid_email(email):
-                    return {'error': 'Invalid email'}, 400
-                if existing_user and str(existing_user.id) != str(user_id):
-                    return {'error': 'Email already in use'}, 409
+        email = data.get('email')
+        if email:
+            existing_user = facade.get_user_by_email(email)
+            if not is_valid_email(email):
+                return {'error': 'Invalid email'}, 400
+            if existing_user and str(existing_user.id) != str(user_id):
+                return {'error': 'Email already in use'}, 409
             if "password" in data:
                 hashed_password = bcrypt.generate_password_hash(
                     data['password']).decode('utf-8')
@@ -98,11 +101,6 @@ class UserRessource(Resource):
                 return {"error": "User not found"}, 404
             return updated_user.to_dict(), 200
 
-        if str(current_user["id"]) != str(user_id):
-            return {"error": "Unauthorized action"}, 403
-
-        if "email" in data or "password" in data:
-            return {"error": "You cannot modify email or password"}, 400
         try:
             updated_user = facade.put_user(user_id, data)
             if not updated_user:
