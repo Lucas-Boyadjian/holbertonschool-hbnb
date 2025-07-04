@@ -88,94 +88,6 @@ class ReviewResource(Resource):
         except Exception as e:
             return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
 
-    @api.expect(review_model)
-    @api.response(200, 'Review updated successfully')
-    @api.response(400, 'Bad request')
-    @api.response(403, 'Unauthorized action')
-    @api.response(404, 'Not found')
-    @api.response(500, 'An unexpected error occurred')
-    @jwt_required()
-    def put(self, review_id):
-        """Update a review's information."""
-        current_user_id = get_jwt_identity()
-        review = facade.get_review(review_id)
-        if review.user.id != current_user_id:
-            return {'error': 'Unauthorized action'}, 403
-
-        try:
-            review_data = request.json
-
-            try:
-                review = facade.get_review(review_id)
-            except KeyError:
-                return {'error': 'Review not found'}, 404
-
-            facade.update_review(review_id, review_data)
-
-            return {
-                'message': 'Review updated successfully'
-            }, 200
-
-        except ValueError as e:
-            return {"error": "Invalid input data: {}".format(str(e))}, 400
-        except Exception as e:
-            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
-
-    @api.response(200, 'Review deleted successfully')
-    @api.response(403, 'Unauthorized action')
-    @api.response(404, 'Not found')
-    @jwt_required()
-    def delete(self, review_id):
-        """Delete a review."""
-        current_user_id = get_jwt_identity()
-        review = facade.get_review(review_id)
-        if review.user.id != current_user_id:
-            return {'error': 'Unauthorized action'}, 403
-        
-        try:
-            try:
-                facade.get_review(review_id)
-            except KeyError:
-                return {'error': 'Review not found'}, 404
-
-            facade.delete_review(review_id)
-
-            return {
-                'message': 'Review deleted successfully'
-            }, 200
-
-        except Exception as e:
-            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
-
-
-@api.route('/places/<place_id>/reviews')
-class PlaceReviewList(Resource):
-    """Resource for retrieving reviews by place."""
-
-    @api.response(200, 'List of reviews for the place retrieved successfully')
-    @api.response(404, 'Not found')
-    @api.response(500, 'An unexpected error occurred')
-    def get(self, place_id):
-        """Get all reviews for a specific place."""
-        try:
-            try:
-                reviews = facade.get_reviews_by_place(place_id)
-            except KeyError:
-                return {'error': 'Place not found'}, 404
-
-            return [
-                {
-                    'id': review.id,
-                    'text': review.text,
-                    'rating': review.rating
-                }
-                for review in reviews
-            ], 200
-
-        except Exception as e:
-            return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
-@api.route('/<review_id>')
-class ReviewResource(Resource):
     @api.response(200, 'List of reviews for the place retrieved successfully')
     @api.response(400, 'Bad request')
     @api.response(403, 'Unauthorized action')
@@ -202,6 +114,7 @@ class ReviewResource(Resource):
 
         return updated_review.to_dict(), 200
     
+
     @api.response(200, 'List of reviews for the place retrieved successfully')
     @api.response(400, 'Bad request')
     @api.response(403, 'Unauthorized action')
@@ -225,7 +138,7 @@ class ReviewResource(Resource):
             return {'message': 'Review deleted successfully'}, 200
         except Exception as e:
              return {"error": "Invalid input data: {}".format(str(e))}, 400
-
+        
 @api.route('/places/<place_id>/reviews')
 class PlaceReviewList(Resource):
     @api.response(200, 'List of reviews for the place retrieved successfully')
@@ -247,3 +160,4 @@ class PlaceReviewList(Resource):
             return {'error': 'Place not found'}, 404
         except Exception as e:
              return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
+        
