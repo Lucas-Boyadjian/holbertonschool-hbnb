@@ -55,7 +55,7 @@ class UserList(Resource):
     @api.response(200, "OK")
     def get(self):
         """Get a list of user"""
-        users = facade.get_all_user()
+        users = facade.get_all_users()
         return [user.to_dict() for user in users], 200
              
 
