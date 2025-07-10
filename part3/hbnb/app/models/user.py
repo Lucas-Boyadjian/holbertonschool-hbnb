@@ -4,10 +4,7 @@ from app import db, bcrypt
 import uuid
 from sqlalchemy.orm import validates, relationship, backref
 from .basemodel import BaseModel
-from flask_bcrypt import Bcrypt
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean
-
-bcrypt = Bcrypt()
 
 class User(BaseModel):
     __tablename__ = 'users'
