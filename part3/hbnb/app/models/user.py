@@ -4,10 +4,7 @@ from app import db, bcrypt
 import uuid
 from sqlalchemy.orm import validates, relationship, backref
 from .basemodel import BaseModel
-from flask_bcrypt import Bcrypt
 from sqlalchemy import ForeignKey, Column, Integer, Float, String, Boolean
-
-bcrypt = Bcrypt()
 
 class User(BaseModel):
     __tablename__ = 'users'
@@ -17,7 +14,7 @@ class User(BaseModel):
     email = Column(String(120), nullable=False, unique=True)
     password = Column(String(128), nullable=False)
     is_admin = Column(Boolean, default=False)
-    places = relationship('Place', backref='user', lazy=True)
+    places = relationship('Place', backref='owner', lazy=True)
     reviews = relationship('Review', backref='user', lazy=True)
     
     @validates('first_name')
@@ -56,16 +53,13 @@ class User(BaseModel):
             self.email = data["email"]
 
     def to_dict(self):
-        data = {
-            "id_user": self.id,
+        return {
+            "id_user": str(self.id),
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
             "is_admin": self.is_admin
         }
-        if self.places:
-            data["places"] = self.places
-        return data
     
     def hash_password(self, password):
         """Hashes the password before storing it."""

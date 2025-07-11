@@ -58,7 +58,8 @@ class PlaceList(Resource):
     @jwt_required()
     def post(self):
         """Register a new place."""
-        current_user_id = get_jwt_identity()
+        current_user = get_jwt_identity()
+        current_user_id = current_user.get('id')
         try:
             place_data = request.json
 
