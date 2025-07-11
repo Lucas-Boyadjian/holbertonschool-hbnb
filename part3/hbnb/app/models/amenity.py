@@ -14,7 +14,7 @@ class Amenity(BaseModel):
     name = Column(String(50), nullable=False)
 
     @validates('name')
-    def name(self, key, value):
+    def validate_name(self, key, value):
         if not value or len(value) > 50:
             raise ValueError("invalid name")
         return value    
@@ -22,6 +22,4 @@ class Amenity(BaseModel):
         return {
             "id": self.id,
             "name": self.name,
-            "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat()
         }
