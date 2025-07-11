@@ -198,7 +198,15 @@ class PlaceResource(Resource):
         place_data = request.json
         try:
             updated_place = facade.update_place(place_id, place_data)
-            return updated_place.to_dict(), 200
+            return {
+                'id': updated_place.id,
+                'title': updated_place.title,
+                'description': updated_place.description,
+                'price': updated_place.price,
+                'latitude': updated_place.latitude,
+                'longitude': updated_place.longitude,
+                'owner_id': updated_place.owner_id,
+            }, 200
         except ValueError as e:
             return {"error": "Invalid input data: {}".format(str(e))}, 400
         except Exception as e:

@@ -54,7 +54,7 @@ class User(BaseModel):
 
     def to_dict(self):
         return {
-            "id_user": str(self.id),
+            "id": str(self.id),
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
