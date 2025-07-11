@@ -5,7 +5,7 @@ from app.services import facade
 
 api = Namespace('protected', description='Protected operations')
 
-@api.route('/protected')
+@api.route('/')
 class ProtectedResource(Resource):
     @jwt_required()
     def get(self):
