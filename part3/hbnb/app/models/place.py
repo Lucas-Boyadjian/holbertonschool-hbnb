@@ -63,7 +63,7 @@ class Place(BaseModel):
 
 
     @validates('price')
-    def price(self, key, value):
+    def validate_price(self, key, value):
         """Set the price per night.
 
         Args:
