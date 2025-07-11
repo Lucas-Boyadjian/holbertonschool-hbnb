@@ -42,7 +42,7 @@ class HBnBFacade:
     
     def create_amenity(self, amenity_data):
         name = amenity_data.get("name")
-        new_amenity = Amenity(name)
+        new_amenity = Amenity(name=name)
         self.amenity_repo.add(new_amenity)
         return new_amenity
 
