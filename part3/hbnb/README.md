@@ -54,6 +54,51 @@ hbnb/
 ```
 
 ---
+## Database Diagrams
+```mermaid
+---
+title: Diagram HBnB
+---
+erDiagram
+    USER ||--o{ PLACE : owns
+    USER {
+        string id PK
+        string first_name
+        string last_name
+        string email
+        string password
+        boolean is_admin
+    }
+    PLACE ||--o{ REVIEW : has
+    PLACE {
+        string id PK
+        string title
+        string description
+        float price
+        int latitude
+        int longitude
+        string owner_id FK "references User"
+    }
+    REVIEW {
+        string id PK
+        string text
+        int rating
+        string user_id FK "references User"
+        string place_id FK "references Place"
+    }
+    PLACE ||--o{ PLACE_AMENITY : contains
+    PLACE_AMENITY {
+        string place_id FK "references Place"
+        string amenity_id FK "references Amenity"
+    }
+    AMENITY }o--|| PLACE_AMENITY : is
+    AMENITY {
+        string id PK
+        string name
+    }
+
+```
+
 ## Installation
 
 1. Clone le dépôt :
