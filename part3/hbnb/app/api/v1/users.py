@@ -8,7 +8,6 @@ from flask import request
 
 api = Namespace('users', description='User operations')
 
-# Define the user model for input validation and documentation
 user_model = api.model('User', {
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
@@ -75,30 +74,39 @@ class UserRessource(Resource):
     @api.response(403, "Unauthorized action")
     @api.response(404, "Not Found")
     @api.response(409, "Conflict")
-    @api.expect(user_model, validate=True)
+    @api.expect(user_model, validate=False)
     @jwt_required()
     def put(self, user_id):
         """Update the data of user (admin: tout, user: limité)"""
         current_user = get_jwt_identity()
-        if not current_user.get('is_admin'):
+        is_admin = current_user.get('is_admin', False)
+        current_user_id = current_user.get('id')
+        
+        user_to_update = facade.get_user(user_id)
+        if not user_to_update:
+            return {"error": "User not found"}, 404
+        
+        if not is_admin and current_user_id != user_id:
             return {'error': 'Admin privileges required'}, 403
         
         data = api.payload
-        email = data.get('email')
-        if email:
-            existing_user = facade.get_user_by_email(email)
-            if not is_valid_email(email):
-                return {'error': 'Invalid email'}, 400
-            if existing_user and str(existing_user.id) != str(user_id):
-                return {'error': 'Email already in use'}, 409
+        
+        if not is_admin:
+            if 'email' in data or 'password' in data:
+                return {'error': 'Admin privileges required'}, 403
+        else:
+            email = data.get('email')
+            if email:
+                if not is_valid_email(email):
+                    return {'error': 'Invalid email'}, 400
+                existing_user = facade.get_user_by_email(email)
+                if existing_user and str(existing_user.id) != str(user_id):
+                    return {'error': 'Email already in use'}, 409
+            
             if "password" in data:
                 hashed_password = bcrypt.generate_password_hash(
                     data['password']).decode('utf-8')
                 data['password'] = hashed_password
-            updated_user = facade.put_user(user_id, data)
-            if not updated_user:
-                return {"error": "User not found"}, 404
-            return updated_user.to_dict(), 200
 
         try:
             updated_user = facade.put_user(user_id, data)

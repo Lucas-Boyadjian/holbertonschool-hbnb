@@ -37,6 +37,7 @@ class HBnBFacade:
         if not user:
             return None
         user.update(data)
+        self.user_repo.update(user_id, data)
         return user
     
     def create_amenity(self, amenity_data):
@@ -75,7 +76,7 @@ class HBnBFacade:
             price=place_data["price"],
             latitude=place_data["latitude"],
             longitude=place_data["longitude"],
-            owner=owner
+            owner_id=place_data["owner_id"]
         )
 
         amenities = place_data.get('amenities', [])
