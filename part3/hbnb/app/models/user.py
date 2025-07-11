@@ -53,16 +53,13 @@ class User(BaseModel):
             self.email = data["email"]
 
     def to_dict(self):
-        data = {
-            "id_user": self.id,
+        return {
+            "id_user": str(self.id),
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
             "is_admin": self.is_admin
         }
-        if self.places:
-            data["places"] = self.places
-        return data
     
     def hash_password(self, password):
         """Hashes the password before storing it."""
