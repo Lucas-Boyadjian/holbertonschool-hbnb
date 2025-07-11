@@ -46,7 +46,7 @@ class Place(BaseModel):
         self.amenities.append(amenity)
 
     @validates('title')
-    def title(self, key, value):
+    def validate_title(self, key, value):
         """Set the title of the place.
 
         Args:
@@ -84,7 +84,7 @@ class Place(BaseModel):
 
     
     @validates('latitude')
-    def latitude(self, key, value):
+    def validate_latitude(self, key, value):
         """Set the geographic latitude.
 
         Args:
@@ -105,7 +105,7 @@ class Place(BaseModel):
 
    
     @validates('longitude')
-    def longitude(self, key, value):
+    def validate_longitude(self, key, value):
         """Set the geographic longitude.
 
         Args:
