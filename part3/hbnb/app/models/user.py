@@ -14,7 +14,7 @@ class User(BaseModel):
     email = Column(String(120), nullable=False, unique=True)
     password = Column(String(128), nullable=False)
     is_admin = Column(Boolean, default=False)
-    places = relationship('Place', backref='user', lazy=True)
+    places = relationship('Place', backref='owner', lazy=True)
     reviews = relationship('Review', backref='user', lazy=True)
     
     @validates('first_name')
