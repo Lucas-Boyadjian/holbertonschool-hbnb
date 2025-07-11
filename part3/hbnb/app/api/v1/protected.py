@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from app.services import facade
 
 
-api = Namespace('auth', description='Authentication operations')
+api = Namespace('protected', description='Protected operations')
 
 @api.route('/protected')
 class ProtectedResource(Resource):
