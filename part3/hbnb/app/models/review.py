@@ -20,12 +20,12 @@ class Review(BaseModel):
 
     text = Column(String(), nullable=False)
     rating = Column(Integer, nullable=False)
-    place_id = Column(Integer, ForeignKey('places.id'), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    place_id = Column(String(36), ForeignKey('places.id'), nullable=False)
+    user_id = Column(String(36), ForeignKey('users.id'), nullable=False)
     
 
     @validates('text')
-    def text(self, key, value):
+    def validate_text(self, key, value):
         """Set the review text.
 
         Args:
@@ -40,7 +40,7 @@ class Review(BaseModel):
 
     
     @validates('rating')
-    def rating(self, key, value):
+    def validate_rating(self, key, value):
         """Set the review rating.
 
         Args:
@@ -55,7 +55,7 @@ class Review(BaseModel):
 
     
     @validates('place')
-    def place(self, key, value):
+    def validate_place(self, key, value):
         """Set the place being reviewed.
 
         Args:
@@ -70,7 +70,7 @@ class Review(BaseModel):
 
     
     @validates('user')
-    def user(self, key, value):
+    def validate_user(self, key, value):
         """Set the user who wrote the review.
 
         Args:

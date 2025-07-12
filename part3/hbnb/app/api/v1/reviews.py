@@ -6,7 +6,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 api = Namespace('reviews', description='Review operations')
 
 review_model = api.model('PlaceReview', {
-    'id': fields.String(description='Review ID'),
     'text': fields.String(description='Text of the review'),
     'rating': fields.Integer(description='Rating of the place (1-5)'),
     'user_id': fields.String(description='ID of the user'),
@@ -27,11 +26,11 @@ class ReviewList(Resource):
             review_data = request.json
             place = facade.get_place(review_data['place_id'])
 
-            if place.owner.id == current_user_id:
+            if place.owner_id == current_user_id:
                 return {'error': 'You cannot review your own place'}, 400
 
             for review in place.reviews:
-                if review.user.id == current_user_id:
+                if review.user_id == current_user_id:
                     return {'error': 'You have already reviewed this place'}, 400
 
             review_data['user_id'] = current_user_id
@@ -41,8 +40,8 @@ class ReviewList(Resource):
                 'id': new_review.id,
                 'text': new_review.text,
                 'rating': new_review.rating,
-                'user_id': new_review.user.id,
-                'place_id': new_review.place.id
+                'user_id': str(new_review.user_id),
+                'place_id': str(new_review.place_id)
             }, 201
 
         except ValueError as e:
@@ -82,8 +81,8 @@ class ReviewResource(Resource):
                 'id': review.id,
                 'text': review.text,
                 'rating': review.rating,
-                'user_id': review.user.id,
-                'place_id': review.place.id
+                'user_id': str(review.user_id),
+                'place_id': str(review.place_id)
             }, 200
         except Exception as e:
             return {'error': "An unexpected error occurred: {}".format(str(e))}, 500
@@ -93,28 +92,38 @@ class ReviewResource(Resource):
     @api.response(403, 'Unauthorized action')
     @api.response(404, 'Not found')
     @api.response(500, 'An unexpected error occurred')
+    @api.expect(review_model)
     @jwt_required()
     def put(self, review_id):
-        current_user = get_jwt_identity()
-        is_admin = current_user.get('is_admin', False)
-        user_id = current_user.get('id') if isinstance(current_user, dict) else current_user
+        current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+        
+        if not current_user:
+            return {'error': 'Invalid user'}, 401
+
+        is_admin = current_user.is_admin
 
         review = facade.get_review(review_id)
         if not review:
             return {'error': 'Review not found'}, 404
 
-        if not is_admin and review.user.id != user_id:
+        if not is_admin and review.user_id != current_user_id:
             return {'error': 'Unauthorized action'}, 403
 
         review_data = request.json
         try:
             updated_review = facade.update_review(review_id, review_data)
+
+            return {
+                'id': updated_review.id,
+                'text': updated_review.text,
+                'rating': updated_review.rating,
+                'user_id': str(updated_review.user_id),
+                'place_id': str(updated_review.place_id)
+            }, 200
         except ValueError as e:
              return {"error": "Invalid input data: {}".format(str(e))}, 400
-
-        return updated_review.to_dict(), 200
     
-
     @api.response(200, 'List of reviews for the place retrieved successfully')
     @api.response(400, 'Bad request')
     @api.response(403, 'Unauthorized action')
@@ -122,15 +131,19 @@ class ReviewResource(Resource):
     @jwt_required()
     def delete(self, review_id):
         """Delete a review (admin can delete any, user only own)."""
-        current_user = get_jwt_identity()
-        is_admin = current_user.get('is_admin', False)
-        user_id = current_user.get('id') if isinstance(current_user, dict) else current_user
+        current_user_id = get_jwt_identity()
+        current_user = facade.get_user(current_user_id)
+
+        if not current_user:
+            return {'error': 'Invalid user'}, 401
+
+        is_admin = current_user.is_admin
 
         review = facade.get_review(review_id)
         if not review:
             return {'error': 'Review not found'}, 404
 
-        if not is_admin and review.user.id != user_id:
+        if not is_admin and review.user_id != current_user_id:
             return {'error': 'Unauthorized action'}, 403
 
         try:

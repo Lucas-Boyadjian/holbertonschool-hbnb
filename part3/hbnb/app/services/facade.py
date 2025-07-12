@@ -58,6 +58,7 @@ class HBnBFacade:
         if amenity is None:
             return None
         amenity.update(amenity_data)
+        self.amenity_repo.update(amenity_id, amenity_data)
         return amenity
 
     def create_place(self, place_data):
@@ -135,6 +136,7 @@ class HBnBFacade:
                     if amenity is None:
                         raise ValueError("Amenity with id {} does not exist.".format(amenity_id))
                     place.add_amenity(amenity)
+        self.place_repo.update(place_id, place_data)
     
         return place
     
@@ -201,6 +203,7 @@ class HBnBFacade:
             if not isinstance(rating, int) or not (1 <= rating <= 5):
                 raise ValueError("Rating must be an integer between 1 and 5")
             review.rating = rating
+        self.review_repo.update(review_id, review_data)
     
         return review
 
@@ -208,9 +211,8 @@ class HBnBFacade:
         """Delete a review"""
         review = self.get_review(review_id)
     
-        if hasattr(review, 'place') and review.place:
-            if review in review.place.reviews:
-                review.place.reviews.remove(review)
+        if not review:
+            raise ValueError("Review not found")
     
         self.review_repo.delete(review_id)
     

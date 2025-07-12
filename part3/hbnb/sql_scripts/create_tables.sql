@@ -1,3 +1,4 @@
+-- database: ../instance/development.db
 -- this file is a script, that create
 -- tables structures 
 

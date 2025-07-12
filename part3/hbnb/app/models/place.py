@@ -9,8 +9,8 @@ from sqlalchemy import ForeignKey, Column, Integer, Float, String, Table
 
 place_amenity = db.Table(
     'place_amenity',
-    db.Column('place_id', db.Integer, db.ForeignKey('places.id'), primary_key=True),
-    db.Column('amenity_id', db.Integer, db.ForeignKey('amenities.id'), primary_key=True)
+    db.Column('place_id', db.String(36), db.ForeignKey('places.id'), primary_key=True),
+    db.Column('amenity_id', db.String(36), db.ForeignKey('amenities.id'), primary_key=True)
 )
 
 class Place(BaseModel):
@@ -33,7 +33,7 @@ class Place(BaseModel):
     price = Column(Float, nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
-    owner_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    owner_id = Column(String(36), ForeignKey('users.id'), nullable=False)
     reviews = relationship('Review', backref='place', lazy=True)
     amenities = relationship('Amenity', secondary=place_amenity, lazy='subquery', backref=backref('places', lazy=True))
     

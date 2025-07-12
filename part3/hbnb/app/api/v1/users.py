@@ -29,9 +29,12 @@ class UserList(Resource):
     @jwt_required()
     def post(self):
         """Create a new user (admin only)"""
-        current_user = get_jwt_identity()
+        current_user_id = get_jwt_identity()
 
-        if not current_user.get('is_admin'):
+        # Récupère l'utilisateur complet depuis la base de données
+        current_user = facade.get_user(current_user_id)
+
+        if not current_user or not current_user.is_admin:
             return {'error': 'Admin privileges required'}, 403
         
         user_data = api.payload
@@ -78,9 +81,14 @@ class UserRessource(Resource):
     @jwt_required()
     def put(self, user_id):
         """Update the data of user (admin: tout, user: limité)"""
-        current_user = get_jwt_identity()
-        is_admin = current_user.get('is_admin', False)
-        current_user_id = current_user.get('id')
+        current_user_id = get_jwt_identity()
+        
+        current_user = facade.get_user(current_user_id)
+        
+        if not current_user:
+            return {'error': 'Invalid user'}, 401
+        
+        is_admin = current_user.is_admin
         
         user_to_update = facade.get_user(user_id)
         if not user_to_update:
