@@ -16,15 +16,22 @@
     </header>
     <main>
         <section id="filter">
-            <label for="price-filter">Max Price:</label>
+            <label for="price-filter"><strong>Max Price:</strong></label>
             <select id="price-filter">
                 <!-- Options will be populated dynamically -->
             </select>
         </section>
         <section id="places-list">
             <div class="place-card">
-                <h2>Appartement Paris</h2>
-                <p>150€ / night</p>
+                <h2><img src="images/icon.png" alt="icon" class="icon">Apartment in Paris</h2>
+                <img src="images/paris.png" alt="paris" class="paris">
+                <p>150€ per night</p>
+                <button class="details-button" onclick="window.location.href='place.html'">View Details</button>
+            </div>
+            <div class="place-card">
+                <h2><img src="images/icon.png" alt="icon" class="icon">Cabin in the Woods</h2>
+                <img src="images/cabane.png" alt="cabane" class="cabane">
+                <p>10€ per night</p>
                 <button class="details-button" onclick="window.location.href='place.html'">View Details</button>
             </div>
             <!-- List of places will be populated dynamically -->

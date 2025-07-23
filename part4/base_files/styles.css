@@ -16,7 +16,7 @@ body {
 }
 
 header {
-    background-color: #333;
+    background-color: #fdd193;
     color: #fff;
     padding: 1rem;
 }
@@ -36,7 +36,8 @@ main {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 10px;
-    background: #fff;
+    background: #ffe5be;
+    text-align: center;
 }
 
 .review-card {
@@ -44,5 +45,59 @@ main {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 10px;
-    background: #fff;
+    background: #ffe5be;
+}
+
+#places-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+#filter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.details-button {
+    background-color: #faae16;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.cabane {
+    width: 120px;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    margin: 10px auto;
+}
+
+.paris {
+    width: 120px;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    margin: 10px auto;
+}
+
+footer {
+    width: 100%;
+    text-align: center;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    background: #fdd193;
+    color: #333;
+    padding: 1rem 0;
+    font-size: 1rem;
 }
