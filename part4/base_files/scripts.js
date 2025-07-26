@@ -76,15 +76,51 @@ async function fetchPlaces(token) {
     }
 }
 
+// Store all places globally for filtering
+let allPlaces = [];
+
 function displayPlaces(places) {
-    // Clear the current content of the places list
-    // Iterate over the places data
-    // For each place, create a div element and set its content
-    // Append the created element to the places list
-    const placesList = document.getElementById('div')
+    allPlaces = places;
+    const placesList = document.getElementById('places-list');
+    if (!placesList) {
+        console.error("#places-list element not found in HTML.");
+        return;
+    }
+    placesList.innerHTML = '';
+    places.forEach(place => {
+        const placeDiv = document.createElement('div');
+        placeDiv.className = 'place-card';
+        placeDiv.innerHTML = `
+            <h2><img src="images/icon.png" alt="icon" class="icon">${place.title}</h2>
+            <p>${place.price}€ per night</p>
+            <button class="details-button" onclick="window.location.href='place.html'">View Details</button>
+        `;
+        placesList.appendChild(placeDiv);
+    });
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const priceFilter = document.getElementById('price-filter');
+    if (priceFilter) {
+        priceFilter.innerHTML = `
+            <option value="10">10</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="All">All</option>
+        `;
+    }
+});
+
 document.getElementById('price-filter').addEventListener('change', (event) => {
-      // Get the selected price value
-      // Iterate over the places and show/hide them based on the selected price
+    // Get the selected price value
+    // Iterate over the places and show/hide them based on the selected price
+    const selectedPrice = event.target.value;
+    let filteredPlaces;
+    if (selectedPrice === 'All') {
+        filteredPlaces = allPlaces;
+    } else {
+        const maxPrice = parseInt(selectedPrice, 10);
+        filteredPlaces = allPlaces.filter(place => parseFloat(place.price) <= maxPrice);
+    }
+    displayPlaces(filteredPlaces);
 });
