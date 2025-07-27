@@ -90,6 +90,14 @@ main {
     margin: 10px auto;
 }
 
+.saint-tropez {
+    width: 120px;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    margin: 10px auto;
+}
+
 footer {
     width: 100%;
     text-align: center;
