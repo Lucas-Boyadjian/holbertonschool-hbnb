@@ -86,6 +86,7 @@ function displayPlaces(places) {
     // Iterate over the places data
     // For each place, create a div element and set its content
     // Append the created element to the places list
+    console.log('places:', places);
     allPlaces = places;
     const placesList = document.getElementById('places-list');
     if (!placesList) {
@@ -98,8 +99,11 @@ function displayPlaces(places) {
         placeDiv.className = 'place-card';
         placeDiv.innerHTML = `
             <h2><img src="images/icon.png" alt="icon" class="icon">${place.title}</h2>
+            <p><strong>Description:</strong> ${place.description}</p>
+            <p><strong>Latitude:</strong> ${place.latitude}</p>
+            <p><strong>Longitude:</strong> ${place.longitude}</p>
             <p>${place.price}€ per night</p>
-            <button class="details-button" onclick="window.location.href='place.html'">View Details</button>
+            <button class="details-button" onclick="window.location.href='place.html?id=${place.id}'">View Details</button>
         `;
         placesList.appendChild(placeDiv);
     });
@@ -115,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="All">All</option>
         `;
     }
+    checkAuthentication();
 });
 
 document.getElementById('price-filter').addEventListener('change', (event) => {
