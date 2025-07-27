@@ -99,7 +99,6 @@ function displayPlaces(places) {
         placeDiv.className = 'place-card';
         placeDiv.innerHTML = `
             <h2><img src="images/icon.png" alt="icon" class="icon">${place.title}</h2>
-            <p>Price per night:${place.price}€</p>
             <p>${place.description ? place.description : ''}</p>
             <p>Latitude: ${place.latitude}</p>
             <p>Longitude: ${place.longitude}</p>
@@ -137,3 +136,85 @@ document.getElementById('price-filter').addEventListener('change', (event) => {
         }
     });
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkAuthentication();
+});
+
+function getPlaceIdFromURL() {
+    // Extract the place ID from window.location.search
+    // Your code here
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id');
+}
+
+function checkAuthentication() {
+    const token = getCookie('token');
+    const addReviewSection = document.getElementById('add-review');
+    const placeId = getPlaceIdFromURL();
+
+    if (!token) {
+        addReviewSection.style.display = 'none';
+    } else {
+        addReviewSection.style.display = 'block';
+        // Store the token for later use
+        fetchPlaceDetails(token, placeId);
+    }
+}
+
+function getCookie(name) {
+    // Function to get a cookie value by its name
+    // Your code here
+    const cookies = document.cookie.split('; ');
+    for (const cookie of cookies) {
+        const [key, value] = cookie.split('=');
+        if (key === name) {
+            return decodeURIComponent(value);
+        }
+    }
+    return null;
+}
+
+async function fetchPlaceDetails(token, placeId) {
+    // Make a GET request to fetch place details
+    // Include the token in the Authorization header
+    // Handle the response and pass the data to displayPlaceDetails function
+    const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    if (response.ok) {
+        const data = await response.json();
+        displayPlaceDetails(data);
+    } else {
+        alert('Failed to fetch place details');
+    }
+}
+
+function displayPlaceDetails(place) {
+    // Clear the current content of the place details section
+    // Create elements to display the place details (name, description, price, amenities and reviews)
+    // Append the created elements to the place details section
+    const placeDetailsSection = document.getElementById('place-details');
+    if (!placeDetailsSection) 
+        return;
+    else
+    placeDetailsSection.innerHTML = '';
+
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'place-info';
+
+    const title = document.createElement('h2');
+    title.textContent = place.title;
+    infoDiv.appendChild(title);
+
+    if (place.description) {
+        const desc = document.createElement('p');
+        desc.innerHTML = `<strong>Description:</strong> ${place.description}`;
+        infoDiv.appendChild(desc);
+    }
+}
