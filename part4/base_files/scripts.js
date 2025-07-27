@@ -37,13 +37,27 @@ async function loginUser(email, password) {
 function checkAuthentication() {
     const token = getCookie('token');
     const loginLink = document.getElementById('login-link');
+    const addReviewSection = document.getElementById('add-review');
+    const placeId = getPlaceIdFromURL();
 
-    if (!token) {
-        loginLink.style.display = 'block';
-    } else {
-        loginLink.style.display = 'none';
-        // Fetch places data if the user is authenticated
-        fetchPlaces(token);
+    if (loginLink) {
+        if (!token) {
+            loginLink.style.display = 'block';
+        } else {
+            loginLink.style.display = 'none';
+            // Fetch places data if the user is authenticated
+            fetchPlaces(token);
+        }
+    }
+
+    if (addReviewSection) {
+        if (!token) {
+            addReviewSection.style.display = 'none';
+        } else {
+            addReviewSection.style.display = 'block';
+            // Store the token for later use
+            fetchPlaceDetails(token, placeId);
+        }
     }
 }
 
@@ -86,7 +100,6 @@ function displayPlaces(places) {
     // Iterate over the places data
     // For each place, create a div element and set its content
     // Append the created element to the places list
-    console.log('places:', places);
     allPlaces = places;
     const placesList = document.getElementById('places-list');
     if (!placesList) {
@@ -137,43 +150,11 @@ document.getElementById('price-filter').addEventListener('change', (event) => {
     });
 });
 
-
-document.addEventListener('DOMContentLoaded', () => {
-    checkAuthentication();
-});
-
 function getPlaceIdFromURL() {
     // Extract the place ID from window.location.search
     // Your code here
     const params = new URLSearchParams(window.location.search);
     return params.get('id');
-}
-
-function checkAuthentication() {
-    const token = getCookie('token');
-    const addReviewSection = document.getElementById('add-review');
-    const placeId = getPlaceIdFromURL();
-
-    if (!token) {
-        addReviewSection.style.display = 'none';
-    } else {
-        addReviewSection.style.display = 'block';
-        // Store the token for later use
-        fetchPlaceDetails(token, placeId);
-    }
-}
-
-function getCookie(name) {
-    // Function to get a cookie value by its name
-    // Your code here
-    const cookies = document.cookie.split('; ');
-    for (const cookie of cookies) {
-        const [key, value] = cookie.split('=');
-        if (key === name) {
-            return decodeURIComponent(value);
-        }
-    }
-    return null;
 }
 
 async function fetchPlaceDetails(token, placeId) {
@@ -189,6 +170,7 @@ async function fetchPlaceDetails(token, placeId) {
     });
     if (response.ok) {
         const data = await response.json();
+        console.log(data); // ← Ajoute ici
         displayPlaceDetails(data);
     } else {
         alert('Failed to fetch place details');
@@ -202,7 +184,6 @@ function displayPlaceDetails(place) {
     const placeDetailsSection = document.getElementById('place-details');
     if (!placeDetailsSection) 
         return;
-    else
     placeDetailsSection.innerHTML = '';
 
     const infoDiv = document.createElement('div');
@@ -216,5 +197,17 @@ function displayPlaceDetails(place) {
         const desc = document.createElement('p');
         desc.innerHTML = `<strong>Description:</strong> ${place.description}`;
         infoDiv.appendChild(desc);
+    }
+
+    if (place.price !== undefined) {
+        const price = document.createElement('p');
+        price.innerHTML = `<strong>Price per night:</strong> ${place.price}€`;
+        infoDiv.appendChild(price);
+    }
+
+    if (place.amenities && place.amenities.length > 0) {
+        const amenities = document.createElement('p');
+        amenities.innerHTML = `<strong>Amenities:</strong> ${place.amenities.map(a => a.name).join(', ')}`;
+        infoDiv.appendChild(amenities);
     }
 }
