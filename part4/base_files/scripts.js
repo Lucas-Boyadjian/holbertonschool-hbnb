@@ -61,6 +61,9 @@ function getCookie(name) {
 }
 
 async function fetchPlaces(token) {
+    // Make a GET request to fetch places data
+    // Include the token in the Authorization header
+    // Handle the response and pass the data to displayPlaces function
     const response = await fetch('http://127.0.0.1:5000/api/v1/places/', {
         method: 'GET',
         headers: { 
@@ -76,10 +79,13 @@ async function fetchPlaces(token) {
     }
 }
 
-// Store all places globally for filtering
 let allPlaces = [];
 
 function displayPlaces(places) {
+    // Clear the current content of the places list
+    // Iterate over the places data
+    // For each place, create a div element and set its content
+    // Append the created element to the places list
     allPlaces = places;
     const placesList = document.getElementById('places-list');
     if (!placesList) {
@@ -112,15 +118,17 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.getElementById('price-filter').addEventListener('change', (event) => {
-    // Get the selected price value
+     // Get the selected price value
     // Iterate over the places and show/hide them based on the selected price
     const selectedPrice = event.target.value;
-    let filteredPlaces;
-    if (selectedPrice === 'All') {
-        filteredPlaces = allPlaces;
-    } else {
-        const maxPrice = parseInt(selectedPrice, 10);
-        filteredPlaces = allPlaces.filter(place => parseFloat(place.price) <= maxPrice);
-    }
-    displayPlaces(filteredPlaces);
+    const cards = document.querySelectorAll('.place-card');
+    cards.forEach(card => {
+        const priceText = card.querySelector('p').textContent;
+        const price = parseFloat(priceText);
+        if (selectedPrice === 'All' || price <= parseInt(selectedPrice, 10)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
 });
