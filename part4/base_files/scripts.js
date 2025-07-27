@@ -99,10 +99,9 @@ function displayPlaces(places) {
         placeDiv.className = 'place-card';
         placeDiv.innerHTML = `
             <h2><img src="images/icon.png" alt="icon" class="icon">${place.title}</h2>
-            <p><strong>Description:</strong> ${place.description}</p>
-            <p><strong>Latitude:</strong> ${place.latitude}</p>
-            <p><strong>Longitude:</strong> ${place.longitude}</p>
-            <p>${place.price}€ per night</p>
+            <p>Price per night:${place.price}€</p>
+            <p>Latitude: ${place.latitude}</p>
+            <p>Longitude: ${place.longitude}</p>
             <button class="details-button" onclick="window.location.href='place.html?id=${place.id}'">View Details</button>
         `;
         placesList.appendChild(placeDiv);
