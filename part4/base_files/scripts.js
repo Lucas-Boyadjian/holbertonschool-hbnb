@@ -87,6 +87,7 @@ async function fetchPlaces(token) {
     });
     if (response.ok) {
         const data = await response.json();
+        allPlaces = data.places || data;
         displayPlaces(data.places || data);
     } else {
         alert('Failed to fetch places');
@@ -100,7 +101,6 @@ function displayPlaces(places) {
     // Iterate over the places data
     // For each place, create a div element and set its content
     // Append the created element to the places list
-    allPlaces = places;
     const placesList = document.getElementById('places-list');
     if (!placesList) {
         console.error("#places-list element not found in HTML.");
@@ -111,11 +111,9 @@ function displayPlaces(places) {
         const placeDiv = document.createElement('div');
         placeDiv.className = 'place-card';
         placeDiv.innerHTML = `
-            <h2><img src="images/icon.png" alt="icon" class="icon">${place.title}</h2>
-            <p>${place.description ? place.description : ''}</p>
-            <p><strong>Price per night:</strong> ${place.price}€</p>
-            <p>Latitude: ${place.latitude}</p>
-            <p>Longitude: ${place.longitude}</p>
+            <h2>${place.title}</h2>
+            <img src="${place.image || 'images/icon.png'}" alt="place image" class="place-img">
+            <p>Price per night: <strong>${place.price}€</strong></p>
             <button class="details-button" onclick="window.location.href='place.html?id=${place.id}'">View Details</button>
         `;
         placesList.appendChild(placeDiv);
@@ -139,16 +137,28 @@ document.getElementById('price-filter').addEventListener('change', (event) => {
      // Get the selected price value
     // Iterate over the places and show/hide them based on the selected price
     const selectedPrice = event.target.value;
-    const cards = document.querySelectorAll('.place-card');
-    cards.forEach(card => {
-        const priceText = card.querySelector('p').textContent;
-        const price = parseFloat(priceText);
-        if (selectedPrice === 'All' || price <= parseInt(selectedPrice, 10)) {
-            card.style.display = 'block';
+    const token = getCookie('token');
+    if (!token) {
+        const cards = document.querySelectorAll('.place-card');
+        cards.forEach(card => {
+            const priceText = card.querySelector('p').textContent;
+            const match = priceText.match(/(\d+)/);
+            const price = match ? parseFloat(match[1]) : 0;
+            if (selectedPrice === "All" || price <= Number(selectedPrice)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    } else {
+        let filteredPlaces;
+        if (selectedPrice === "All") {
+            filteredPlaces = allPlaces;
         } else {
-            card.style.display = 'none';
+            filteredPlaces = allPlaces.filter(place => Number(place.price) <= Number(selectedPrice));
         }
-    });
+        displayPlaces(filteredPlaces);
+    }
 });
 
 function getPlaceIdFromURL() {
@@ -171,7 +181,6 @@ async function fetchPlaceDetails(token, placeId) {
     });
     if (response.ok) {
         const data = await response.json();
-        console.log(data); // ← Ajoute ici
         displayPlaceDetails(data);
     } else {
         alert('Failed to fetch place details');
@@ -189,6 +198,11 @@ function displayPlaceDetails(place) {
 
     const infoDiv = document.createElement('div');
     infoDiv.className = 'place-info';
+
+    const bigImg = document.createElement('img');
+    bigImg.src = place.image || 'images/icon.png';
+    bigImg.className = 'placedetails-img';
+    infoDiv.appendChild(bigImg);
 
     const title = document.createElement('h2');
     title.textContent = place.title;
@@ -211,4 +225,6 @@ function displayPlaceDetails(place) {
         amenities.innerHTML = `<strong>Amenities:</strong> ${place.amenities.map(a => a.name).join(', ')}`;
         infoDiv.appendChild(amenities);
     }
+    document.getElementById('place-details').appendChild(infoDiv);
+
 }

@@ -36,7 +36,8 @@ class Place(BaseModel):
     owner_id = Column(String(36), ForeignKey('users.id'), nullable=False)
     reviews = relationship('Review', backref='place', lazy=True)
     amenities = relationship('Amenity', secondary=place_amenity, lazy='subquery', backref=backref('places', lazy=True))
-    
+    image = Column(String(), nullable=True)
+
     def add_review(self, review):
         """Add a review to the place."""
         self.reviews.append(review)

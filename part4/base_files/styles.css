@@ -98,6 +98,24 @@ main {
     margin: 10px auto;
 }
 
+.place-img {
+    width: 120px;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    margin: 10px auto;
+    margin-bottom: 10px;
+}
+
+.placedetails-img {
+    display: block;
+    margin: 20px auto;
+    width: 800px;
+    height: 500px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
 footer {
     width: 100%;
     text-align: center;

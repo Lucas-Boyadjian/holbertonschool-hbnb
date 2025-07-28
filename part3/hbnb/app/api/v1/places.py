@@ -101,8 +101,10 @@ class PlaceList(Resource):
                 {
                     'id': place.id,
                     'title': place.title,
+                    'price': place.price,
                     'latitude': place.latitude,
-                    'longitude': place.longitude
+                    'longitude': place.longitude,
+                    'image': place.image
                 }
                 for place in places
             ], 200
@@ -142,6 +144,7 @@ class PlaceResource(Resource):
                 'latitude': place.latitude,
                 'longitude': place.longitude,
                 'owner': owner_data,
+                'image': place.image
             }
 
             amenities_data = [
@@ -209,6 +212,7 @@ class PlaceResource(Resource):
                 'latitude': updated_place.latitude,
                 'longitude': updated_place.longitude,
                 'owner_id': updated_place.owner_id,
+                'image': updated_place.image
             }, 200
         except ValueError as e:
             return {"error": "Invalid input data: {}".format(str(e))}, 400
