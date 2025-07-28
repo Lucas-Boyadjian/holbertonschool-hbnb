@@ -101,7 +101,7 @@ class UserRessource(Resource):
         
         if not is_admin:
             if 'email' in data or 'password' in data:
-                return {'error': 'Admin privileges required'}, 403
+                return {'error': 'You cannot modify email or password'}, 400
         else:
             email = data.get('email')
             if email:
