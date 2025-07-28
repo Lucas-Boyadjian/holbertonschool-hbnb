@@ -113,6 +113,7 @@ function displayPlaces(places) {
         placeDiv.innerHTML = `
             <h2><img src="images/icon.png" alt="icon" class="icon">${place.title}</h2>
             <p>${place.description ? place.description : ''}</p>
+            <p><strong>Price per night:</strong> ${place.price}€</p>
             <p>Latitude: ${place.latitude}</p>
             <p>Longitude: ${place.longitude}</p>
             <button class="details-button" onclick="window.location.href='place.html?id=${place.id}'">View Details</button>
