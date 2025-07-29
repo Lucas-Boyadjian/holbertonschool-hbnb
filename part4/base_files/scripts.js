@@ -4,6 +4,7 @@
 */
 
 document.addEventListener('DOMContentLoaded', () => {
+    checkAuthentication();
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
@@ -39,25 +40,23 @@ function checkAuthentication() {
     const loginLink = document.getElementById('login-link');
     const addReviewSection = document.getElementById('add-review');
     const placeId = getPlaceIdFromURL();
+    const path = window.location.pathname;
+    const homeLogin = path.endsWith('index.html') || document.getElementById('login-form');
 
-    if (loginLink) {
-        if (!token) {
-            loginLink.style.display = 'block';
-        } else {
-            loginLink.style.display = 'none';
-            // Fetch places data if the user is authenticated
-            fetchPlaces(token);
-        }
-    }
-
-    if (addReviewSection) {
-        if (!token) {
-            addReviewSection.style.display = 'none';
-        } else {
+    if (!token) {
+        if (loginLink) loginLink.style.display = 'block';
+        if (addReviewSection) addReviewSection.style.display = 'none';
+        if (!homeLogin) window.location.href = 'index.html';
+        
+    } else {
+        if (loginLink) loginLink.style.display = 'none';
+        if (addReviewSection) {
             addReviewSection.style.display = 'block';
             // Store the token for later use
             fetchPlaceDetails(token, placeId);
         }
+        // Fetch places data if the user is authenticated
+        fetchPlaces(token);
     }
 }
 
