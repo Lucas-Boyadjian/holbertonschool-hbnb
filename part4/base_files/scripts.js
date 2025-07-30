@@ -257,4 +257,23 @@ function displayPlaceDetails(place) {
         <p><strong>Amenities:</strong> ${place.amenities.map(a => a.name).join(', ')}</p>
     `;
     placeDetails.appendChild(placeDetailsDiv);
+
+    const reviewDetails = document.getElementById('reviews');
+    if (reviewDetails) {
+        reviewDetails.innerHTML = '';
+        if (place.reviews && place.reviews.length > 0) {
+            place.reviews.forEach(review => {
+                const placeReviewDiv = document.createElement('div');
+                placeReviewDiv.className = 'review-card';
+                placeReviewDiv.innerHTML = `
+                    <p><strong>${review.user?.first_name} ${review.user?.last_name} :</strong></p>
+                    <p>${review.text}</p>
+                    <p>Rating: ${review.rating}/5</p>
+                `;
+                reviewDetails.appendChild(placeReviewDiv);
+            });
+        } else {
+            reviewDetails.innerHTML = '<p>No reviews yet.</p>';
+        }
+    }
 }
