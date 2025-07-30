@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Handle the response
             const reviewText = document.getElementById('review').value;
             const reviewRating = document.getElementById('rating').value;
-            const result = await submitReview(token, placeId, reviewText, reviewRating);
+            const result = await submitReview(token, placeId, reviewText);
             handleReviewResponse(result, reviewForm);
         });
     }
@@ -95,6 +95,7 @@ async function submitReview(token, placeId, reviewText) {
     // Send placeId and reviewText in the request body
     // Handle the response
     try {
+        const reviewRating = document.getElementById('rating').value;
         const response = await fetch('http://127.0.0.1:5000/api/v1/reviews/', {
             method: 'POST',
             headers: {
@@ -207,7 +208,6 @@ function displayPlaces(places) {
     // Append the created element to the places list
     const placesList = document.getElementById('places-list');
     if (!placesList) {
-        console.error("#places-list element not found in HTML.");
         return;
     }
     placesList.innerHTML = '';
