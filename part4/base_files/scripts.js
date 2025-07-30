@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const reviewForm = document.getElementById('review-form');
     const token = checkAuthentication();
+    console.log('token:', token);
     const placeId = getPlaceIdFromURL();
     if (reviewForm) {
         reviewForm.addEventListener('submit', async (event) => {
@@ -67,15 +68,22 @@ document.addEventListener('DOMContentLoaded', () => {
             // Get review text from form
             // Make AJAX request to submit review
             // Handle the response
-            const reviewText = document.getElementById('review-text').value;
-            const result = await submitReview(token, placeId, reviewText);
-            if (result) {
-                alert('Review submitted successfully!');
-                reviewForm.reset();
-            } else {
-                alert('Error submitting the review.');
-            }
+            const reviewText = document.getElementById('review').value;
+            const reviewRating = document.getElementById('rating').value;
+            const result = await submitReview(token, placeId, reviewText, reviewRating);
+            handleReviewResponse(result, reviewForm);
         });
+    }
+
+    const ratingSelect = document.getElementById('rating');
+    if (ratingSelect) {
+        ratingSelect.innerHTML = '<option value="">Choose a rating</option>';
+        for (let i = 1; i <= 5; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            ratingSelect.appendChild(option);
+        }
     }
 });
 
@@ -93,7 +101,8 @@ async function submitReview(token, placeId, reviewText) {
             },
             body: JSON.stringify({
                 place_id: placeId,
-                text: reviewText
+                text: reviewText,
+                rating: Number(reviewRating)
             })
         });
         if (response.ok) {
@@ -275,5 +284,17 @@ function displayPlaceDetails(place) {
         } else {
             reviewDetails.innerHTML = '<p>No reviews yet.</p>';
         }
+    }
+}
+
+function handleReviewResponse(result, reviewForm) {
+    if (result) {
+        alert('Review submitted successfully!');
+        reviewForm.reset();
+        const token = getCookie('token');
+        const placeId = getPlaceIdFromURL();
+        fetchPlaceDetails(token, placeId);
+    } else {
+        alert('Failed to submit review.');
     }
 }
