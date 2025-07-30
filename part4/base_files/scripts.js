@@ -240,46 +240,21 @@ function displayPlaceDetails(place) {
     // Clear the current content of the place details section
     // Create elements to display the place details (name, description, price, amenities and reviews)
     // Append the created elements to the place details section
-    const placeDetailsSection = document.getElementById('place-details');
-    if (!placeDetailsSection) 
+    const placeDetails = document.getElementById('place-details');
+    if (!placeDetails)
         return;
-    placeDetailsSection.innerHTML = '';
+    placeDetails.innerHTML = '';
 
-    const infoDiv = document.createElement('div');
-    infoDiv.className = 'place-info';
-
-    const bigImg = document.createElement('img');
-    bigImg.src = place.image || 'images/icon.png';
-    bigImg.className = 'placedetails-img';
-    infoDiv.appendChild(bigImg);
-
-    const title = document.createElement('h2');
-    title.textContent = place.title;
-    infoDiv.appendChild(title);
-    
-    if (place.latitude) {
-        const locat = document.createElement('p');
-        locat.innerHTML = `<strong>Location:</strong> ${place.latitude} , ${place.longitude}`;
-        infoDiv.appendChild(locat);
-    }
-    
-    if (place.description) {
-        const desc = document.createElement('p');
-        desc.innerHTML = `<strong>Description:</strong> ${place.description}`;
-        infoDiv.appendChild(desc);
-    }
-
-    if (place.price) {
-        const price = document.createElement('p');
-        price.innerHTML = `<strong>Price per night:</strong> ${place.price}€`;
-        infoDiv.appendChild(price);
-    }
-
-    if (place.amenities && place.amenities.length > 0) {
-        const amenities = document.createElement('p');
-        amenities.innerHTML = `<strong>Amenities:</strong> ${place.amenities.map(a => a.name).join(', ')}`;
-        infoDiv.appendChild(amenities);
-    }
-    document.getElementById('place-details').appendChild(infoDiv);
-
+    const placeDetailsDiv = document.createElement('div');
+    placeDetailsDiv.className = 'place-info';
+    placeDetailsDiv.innerHTML = `
+        <img src="${place.image || 'images/icon.png'}" alt="place image" class="placedetails-img">
+        <h2>${place.title}</h2>
+        <p><strong>Host:</strong> ${place.owner.first_name} ${place.owner.last_name}
+        <p><strong>Location:</strong> Latitude: ${place.latitude} | Longitude: ${place.longitude}</p>
+        <p><strong>Description:</strong> ${place.description}</p>
+        <p><strong>Price per night:</strong> ${place.price}€</p>
+        <p><strong>Amenities:</strong> ${place.amenities.map(a => a.name).join(', ')}</p>
+    `;
+    placeDetails.appendChild(placeDetailsDiv);
 }
