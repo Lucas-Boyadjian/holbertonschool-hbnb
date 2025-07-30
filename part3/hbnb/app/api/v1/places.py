@@ -77,6 +77,7 @@ class PlaceList(Resource):
                 'latitude': new_place.latitude,
                 'longitude': new_place.longitude,
                 'owner_id': new_place.owner.id,
+                'image': new_place.image
             }
 
             amenity_ids = [amenity.id for amenity in new_place.amenities]
