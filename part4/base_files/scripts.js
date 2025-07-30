@@ -60,6 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const reviewForm = document.getElementById('review-form');
     const token = checkAuthentication();
+    console.log('document.cookie:', document.cookie);
+    console.log('getCookie(token):', getCookie('token'));
     console.log('token:', token);
     const placeId = getPlaceIdFromURL();
     if (reviewForm) {
@@ -136,7 +138,8 @@ async function loginUser(email, password) {
 }
 
 function checkAuthentication() {
-    const token = authToken || getCookie('token');
+    const token = getCookie('token');
+    authToken = token;
     const loginLink = document.getElementById('login-link');
     const addReviewSection = document.getElementById('add-review');
     const placeId = getPlaceIdFromURL();
@@ -158,6 +161,8 @@ function checkAuthentication() {
         // Fetch places data if the user is authenticated
         fetchPlaces(token);
     }
+    console.log('checkAuthentication() token:', token);
+    return token;
 }
 
 function getCookie(name) {
