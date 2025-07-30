@@ -6,8 +6,48 @@
 let authToken = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuthentication();
+    checkAuthentication()
+    const priceFilter = document.getElementById('price-filter');
+
+    if (priceFilter) {
+        priceFilter.innerHTML = `
+            <option value="10">10</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="All">All</option>
+        `;
+        document.getElementById('price-filter').addEventListener('change', (event) => {
+        // Get the selected price value
+        // Iterate over the places and show/hide them based on the selected price
+            const selectedPrice = event.target.value;
+            const token = getCookie('token');
+
+            if (!token) {
+                const cards = document.querySelectorAll('.place-card');
+                cards.forEach(card => {
+                    const priceText = card.querySelector('p').textContent;
+                    const match = priceText.match(/(\d+)/);
+                    const price = match ? parseFloat(match[1]) : 0;
+                    if (selectedPrice === "All" || price <= Number(selectedPrice)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            } else {
+                let filteredPlaces;
+                if (selectedPrice === "All") {
+                    filteredPlaces = allPlaces;
+                } else {
+                    filteredPlaces = allPlaces.filter(place => Number(place.price) <= Number(selectedPrice));
+                }
+                displayPlaces(filteredPlaces);
+            }
+        });
+    }
+
     const loginForm = document.getElementById('login-form');
+
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -16,8 +56,56 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.getElementById('password').value;
             await loginUser(email, password);
         });
-    }       
+    }
+    
+    const reviewForm = document.getElementById('review-form');
+    const token = checkAuthentication();
+    const placeId = getPlaceIdFromURL();
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            // Get review text from form
+            // Make AJAX request to submit review
+            // Handle the response
+            const reviewText = document.getElementById('review-text').value;
+            const result = await submitReview(token, placeId, reviewText);
+            if (result) {
+                alert('Review submitted successfully!');
+                reviewForm.reset();
+            } else {
+                alert('Error submitting the review.');
+            }
+        });
+    }
 });
+
+async function submitReview(token, placeId, reviewText) {
+    // Make a POST request to submit review data
+    // Include the token in the Authorization header
+    // Send placeId and reviewText in the request body
+    // Handle the response
+    try {
+        const response = await fetch('http://127.0.0.1:5000/api/v1/reviews/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                place_id: placeId,
+                text: reviewText
+            })
+        });
+        if (response.ok) {
+            return await response.json();
+        } else {
+            throw new Error('Error submitting the review.');
+        }
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
 
 async function loginUser(email, password) {
     const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
@@ -113,7 +201,7 @@ function displayPlaces(places) {
         const placeDiv = document.createElement('div');
         placeDiv.className = 'place-card';
         placeDiv.innerHTML = `
-            <h2>${place.title}</h2>
+            <h2><img src="images/icon.png" alt="icon" class="icon">${place.title}</h2>
             <img src="${place.image || 'images/icon.png'}" alt="place image" class="place-img">
             <p>Price per night: <strong>${place.price}€</strong></p>
             <button class="details-button" onclick="window.location.href='place.html?id=${place.id}'">View Details</button>
@@ -121,48 +209,6 @@ function displayPlaces(places) {
         placesList.appendChild(placeDiv);
     });
 }
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    const priceFilter = document.getElementById('price-filter');
-    if (priceFilter) {
-        priceFilter.innerHTML = `
-            <option value="10">10</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-            <option value="All">All</option>
-        `;
-    }
-    checkAuthentication();
-});
-
-document.getElementById('price-filter').addEventListener('change', (event) => {
-     // Get the selected price value
-    // Iterate over the places and show/hide them based on the selected price
-    const selectedPrice = event.target.value;
-    const token = getCookie('token');
-    if (!token) {
-        const cards = document.querySelectorAll('.place-card');
-        cards.forEach(card => {
-            const priceText = card.querySelector('p').textContent;
-            const match = priceText.match(/(\d+)/);
-            const price = match ? parseFloat(match[1]) : 0;
-            if (selectedPrice === "All" || price <= Number(selectedPrice)) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    } else {
-        let filteredPlaces;
-        if (selectedPrice === "All") {
-            filteredPlaces = allPlaces;
-        } else {
-            filteredPlaces = allPlaces.filter(place => Number(place.price) <= Number(selectedPrice));
-        }
-        displayPlaces(filteredPlaces);
-    }
-});
 
 function getPlaceIdFromURL() {
     // Extract the place ID from window.location.search
@@ -210,14 +256,20 @@ function displayPlaceDetails(place) {
     const title = document.createElement('h2');
     title.textContent = place.title;
     infoDiv.appendChild(title);
-
+    
+    if (place.latitude) {
+        const locat = document.createElement('p');
+        locat.innerHTML = `<strong>Location:</strong> ${place.latitude} , ${place.longitude}`;
+        infoDiv.appendChild(locat);
+    }
+    
     if (place.description) {
         const desc = document.createElement('p');
         desc.innerHTML = `<strong>Description:</strong> ${place.description}`;
         infoDiv.appendChild(desc);
     }
 
-    if (place.price !== undefined) {
+    if (place.price) {
         const price = document.createElement('p');
         price.innerHTML = `<strong>Price per night:</strong> ${place.price}€`;
         infoDiv.appendChild(price);
