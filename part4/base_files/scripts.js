@@ -3,6 +3,8 @@
   Please, follow the project instructions to complete the tasks.
 */
 
+let authToken = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     checkAuthentication();
     const loginForm = document.getElementById('login-form');
@@ -29,6 +31,7 @@ async function loginUser(email, password) {
     if (response.ok) {
         const data = await response.json();
         document.cookie = `token=${data.access_token}; path=/`;
+        authToken = data.access_token;
         window.location.href = 'index.html';
     } else {
         alert('Login failed: ' + response.statusText);
@@ -36,7 +39,7 @@ async function loginUser(email, password) {
 }
 
 function checkAuthentication() {
-    const token = getCookie('token');
+    const token = authToken || getCookie('token');
     const loginLink = document.getElementById('login-link');
     const addReviewSection = document.getElementById('add-review');
     const placeId = getPlaceIdFromURL();
@@ -118,6 +121,7 @@ function displayPlaces(places) {
         placesList.appendChild(placeDiv);
     });
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const priceFilter = document.getElementById('price-filter');
