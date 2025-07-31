@@ -5,10 +5,10 @@
 
 let authToken = null;
 
+// Handles DOMContentLoaded event and sets up event listeners for filters, login, and review form.
 document.addEventListener('DOMContentLoaded', () => {
     checkAuthentication()
     const priceFilter = document.getElementById('price-filter');
-
     if (priceFilter) {
         priceFilter.innerHTML = `
             <option value="10">10</option>
@@ -16,9 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="100">100</option>
             <option value="All">All</option>
         `;
+        // Handles price filter changes and updates displayed places accordingly.
         document.getElementById('price-filter').addEventListener('change', (event) => {
-        // Get the selected price value
-        // Iterate over the places and show/hide them based on the selected price
             const selectedPrice = event.target.value;
             const token = getCookie('token');
 
@@ -45,28 +44,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
+    // Handles login form submission and calls loginUser.
     const loginForm = document.getElementById('login-form');
-
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            // Your code to handle form submission
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             await loginUser(email, password);
         });
     }
-    
+    // Handles review form submission and calls submitReview.
     const reviewForm = document.getElementById('review-form');
     const token = checkAuthentication();
     const placeId = getPlaceIdFromURL();
     if (reviewForm) {
         reviewForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            // Get review text from form
-            // Make AJAX request to submit review
-            // Handle the response
             const reviewText = document.getElementById('review-text').value;
             const result = await submitReview(token, placeId, reviewText);
             handleReviewResponse(result, reviewForm);
@@ -74,11 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Sends a POST request to submit a new review for a place.
 async function submitReview(token, placeId, reviewText) {
-    // Make a POST request to submit review data
-    // Include the token in the Authorization header
-    // Send placeId and reviewText in the request body
-    // Handle the response
     try {
         const reviewRating = document.getElementById('rating').value;
         const response = await fetch('http://127.0.0.1:5000/api/v1/reviews/', {
@@ -104,6 +95,7 @@ async function submitReview(token, placeId, reviewText) {
     }
 }
 
+// Sends a POST request to log in the user and stores the token in a cookie.
 async function loginUser(email, password) {
     const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
         method: 'POST',
@@ -112,7 +104,7 @@ async function loginUser(email, password) {
         },
         body: JSON.stringify({ email, password })
     });
-    // Handle the response
+    // Handles the login response and redirects on success.
     if (response.ok) {
         const data = await response.json();
         document.cookie = `token=${data.access_token}; path=/`;
@@ -123,6 +115,7 @@ async function loginUser(email, password) {
     }
 }
 
+// Checks if the user is authenticated and updates UI accordingly.
 function checkAuthentication() {
     const token = getCookie('token');
     authToken = token;
@@ -141,19 +134,18 @@ function checkAuthentication() {
         if (loginLink) loginLink.style.display = 'none';
         if (addReviewSection) {
             addReviewSection.style.display = 'block';
-            // Store the token for later use
+            // Fetches place details if authenticated.
             fetchPlaceDetails(token, placeId);
         }
-        // Fetch places data if the user is authenticated
+        // Fetch places if the user is authenticated.
         fetchPlaces(token);
     }
     console.log('checkAuthentication() token:', token);
     return token;
 }
 
+// Retrieves a cookie value by its name.
 function getCookie(name) {
-    // Function to get a cookie value by its name
-    // Your code here
     const cookies = document.cookie.split('; ');
     for (const cookie of cookies) {
         const [key, value] = cookie.split('=');
@@ -164,10 +156,8 @@ function getCookie(name) {
     return null;
 }
 
+// Fetches all places from the API and displays them.
 async function fetchPlaces(token) {
-    // Make a GET request to fetch places data
-    // Include the token in the Authorization header
-    // Handle the response and pass the data to displayPlaces function
     const response = await fetch('http://127.0.0.1:5000/api/v1/places/', {
         method: 'GET',
         headers: { 
@@ -186,11 +176,8 @@ async function fetchPlaces(token) {
 
 let allPlaces = [];
 
+// Displays the list of places on the page.
 function displayPlaces(places) {
-    // Clear the current content of the places list
-    // Iterate over the places data
-    // For each place, create a div element and set its content
-    // Append the created element to the places list
     const placesList = document.getElementById('places-list');
     if (!placesList) {
         return;
@@ -209,17 +196,14 @@ function displayPlaces(places) {
     });
 }
 
+// Extracts the place ID from the URL query parameters.
 function getPlaceIdFromURL() {
-    // Extract the place ID from window.location.search
-    // Your code here
     const params = new URLSearchParams(window.location.search);
     return params.get('id');
 }
 
+// Fetches the details of a specific place and displays them.
 async function fetchPlaceDetails(token, placeId) {
-    // Make a GET request to fetch place details
-    // Include the token in the Authorization header
-    // Handle the response and pass the data to displayPlaceDetails function
     const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
         method: 'GET',
         headers: {
@@ -235,10 +219,8 @@ async function fetchPlaceDetails(token, placeId) {
     }
 }
 
+// Displays the details of a place, including its reviews.
 function displayPlaceDetails(place) {
-    // Clear the current content of the place details section
-    // Create elements to display the place details (name, description, price, amenities and reviews)
-    // Append the created elements to the place details section
     const placeDetails = document.getElementById('place-details');
     console.log('place:', place);
     if (!placeDetails)
@@ -263,13 +245,11 @@ function displayPlaceDetails(place) {
         reviewDetails.innerHTML = '';
         reviewDetails.innerHTML = '<h2>Reviews</h2>';
         if (place.reviews && place.reviews.length > 0) {
-            console.log('place.reviews:', place.reviews);
             place.reviews.forEach(review => {
-                console.log('review:', review);
                 const placeReviewDiv = document.createElement('div');
                 placeReviewDiv.className = 'review-card';
                 placeReviewDiv.innerHTML = `
-                    <p><strong>${review.user.first_name} ${review.user.last_name} :</strong></p>
+                    <p><strong>${review.first_name} ${review.last_name} :</strong></p>
                     <p>${review.text}</p>
                     <p>Rating: ${review.rating}/5</p>
                 `;
@@ -281,6 +261,7 @@ function displayPlaceDetails(place) {
     }
 }
 
+// Handles the response after submitting a review and refreshes the place details
 function handleReviewResponse(result, reviewForm) {
     if (result) {
         alert('Review submitted successfully!');

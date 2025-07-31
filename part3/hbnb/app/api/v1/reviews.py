@@ -59,7 +59,9 @@ class ReviewList(Resource):
                 {
                     'id': review.id,
                     'text': review.text,
-                    'rating': review.rating
+                    'rating': review.rating,
+                    'first_name': review.user.first_name,
+                    'last_name': review.user.last_name
                 }
                 for review in reviews
             ], 200
@@ -81,6 +83,8 @@ class ReviewResource(Resource):
                 'id': review.id,
                 'text': review.text,
                 'rating': review.rating,
+                'first_name': review.user.first_name,
+                'last_name': review.user.last_name,
                 'user_id': str(review.user_id),
                 'place_id': str(review.place_id)
             }, 200
@@ -118,6 +122,8 @@ class ReviewResource(Resource):
                 'id': updated_review.id,
                 'text': updated_review.text,
                 'rating': updated_review.rating,
+                'first_name': updated_review.user.first_name,
+                'last_name': updated_review.user.last_name,
                 'user_id': str(updated_review.user_id),
                 'place_id': str(updated_review.place_id)
             }, 200
@@ -165,7 +171,9 @@ class PlaceReviewList(Resource):
                 {
                     'id': review.id,
                     'text': review.text,
-                    'rating': review.rating
+                    'rating': review.rating,
+                    'first_name': review.user.first_name,
+                    'last_name': review.user.last_name,
                 }
                 for review in reviews
             ], 200

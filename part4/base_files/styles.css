@@ -68,7 +68,6 @@ nav a {
     color: #000000;
 }
 
-
 nav a:active {
     background: #e09e0b;
     transform: scale(0.97);
@@ -107,7 +106,7 @@ main {
 
 .login-box input {
     width: 100%;
-    padding: 0.7rem 1rem;
+    padding: 0.5rem 1rem;
     margin-bottom: 1.2rem;
     border: 1px solid #faae16;
     border-radius: 8px;
