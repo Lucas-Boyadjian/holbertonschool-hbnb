@@ -60,9 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const reviewForm = document.getElementById('review-form');
     const token = checkAuthentication();
-    console.log('document.cookie:', document.cookie);
-    console.log('getCookie(token):', getCookie('token'));
-    console.log('token:', token);
     const placeId = getPlaceIdFromURL();
     if (reviewForm) {
         reviewForm.addEventListener('submit', async (event) => {
@@ -70,22 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Get review text from form
             // Make AJAX request to submit review
             // Handle the response
-            const reviewText = document.getElementById('review').value;
-            const reviewRating = document.getElementById('rating').value;
+            const reviewText = document.getElementById('review-text').value;
             const result = await submitReview(token, placeId, reviewText);
             handleReviewResponse(result, reviewForm);
         });
-    }
-
-    const ratingSelect = document.getElementById('rating');
-    if (ratingSelect) {
-        ratingSelect.innerHTML = '<option value="">Choose a rating</option>';
-        for (let i = 1; i <= 5; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i;
-            ratingSelect.appendChild(option);
-        }
     }
 });
 

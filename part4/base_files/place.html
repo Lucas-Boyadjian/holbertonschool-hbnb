@@ -55,15 +55,20 @@
         </section>
         <section id="add-review" class="add-review">
             <h2>Add a Review</h2>
-            <form id="review-form">
+            <form id="review-form" class="form">
                 <label for="review-text">Review:</label>
                 <textarea id="review-text" name="review-text" required></textarea>
-                
+                <label for="rating">Rating:</label>
+                <select id="rating" name="rating" required>
+                    <option value="">Select</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
                 <button type="submit">Submit</button>
             </form>
-            <button id="add-review-btn" onclick="window.location.href='add_review.html'" style="display:none;">
-                Add review page
-            </button>
         </section>
     </main>
     <script src="scripts.js"></script>
