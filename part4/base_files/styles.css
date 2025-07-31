@@ -14,7 +14,7 @@
 body {
     background-color: #f4f4f4;
     color: #333;
-    font-size: 28px;
+    font-size: 20px;
 }
 
 header {
@@ -88,8 +88,8 @@ main {
 .placedetails-img {
     display: block;
     margin: 20px auto;
-    width: 1200px;
-    height: 800px;
+    width: 800px;
+    height: 500px;
     object-fit: cover;
     border-radius: 12px;
 }
