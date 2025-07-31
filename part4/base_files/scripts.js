@@ -240,6 +240,7 @@ function displayPlaceDetails(place) {
     // Create elements to display the place details (name, description, price, amenities and reviews)
     // Append the created elements to the place details section
     const placeDetails = document.getElementById('place-details');
+    console.log('place:', place);
     if (!placeDetails)
         return;
     placeDetails.innerHTML = '';
@@ -249,7 +250,7 @@ function displayPlaceDetails(place) {
     placeDetailsDiv.innerHTML = `
         <img src="${place.image || 'images/icon.png'}" alt="place image" class="placedetails-img">
         <h2>${place.title}</h2>
-        <p><strong>Host:</strong> ${place.owner.first_name} ${place.owner.last_name}
+        <p><strong>Host:</strong> ${place.owner.first_name} ${place.owner.last_name}</p>
         <p><strong>Location:</strong> Latitude: ${place.latitude} | Longitude: ${place.longitude}</p>
         <p><strong>Description:</strong> ${place.description}</p>
         <p><strong>Price per night:</strong> ${place.price}€</p>
@@ -262,11 +263,13 @@ function displayPlaceDetails(place) {
         reviewDetails.innerHTML = '';
         reviewDetails.innerHTML = '<h2>Reviews</h2>';
         if (place.reviews && place.reviews.length > 0) {
+            console.log('place.reviews:', place.reviews);
             place.reviews.forEach(review => {
+                console.log('review:', review);
                 const placeReviewDiv = document.createElement('div');
                 placeReviewDiv.className = 'review-card';
                 placeReviewDiv.innerHTML = `
-                    <p><strong>${review.user?.first_name} ${review.user?.last_name} :</strong></p>
+                    <p><strong>${review.user.first_name} ${review.user.last_name} :</strong></p>
                     <p>${review.text}</p>
                     <p>Rating: ${review.rating}/5</p>
                 `;
