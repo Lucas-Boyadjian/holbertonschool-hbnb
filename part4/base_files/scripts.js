@@ -260,6 +260,7 @@ function displayPlaceDetails(place) {
     const reviewDetails = document.getElementById('reviews');
     if (reviewDetails) {
         reviewDetails.innerHTML = '';
+        reviewDetails.innerHTML = '<h2>Reviews</h2>';
         if (place.reviews && place.reviews.length > 0) {
             place.reviews.forEach(review => {
                 const placeReviewDiv = document.createElement('div');

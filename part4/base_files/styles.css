@@ -7,12 +7,14 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Times New Roman', Verdana, Arial, sans-serif;
+    font-family: 'Trebuchet MS', Verdana, Arial, sans-serif;
+
 }
 
 body {
     background-color: #f4f4f4;
     color: #333;
+    font-size: 28px;
 }
 
 header {
@@ -74,44 +76,20 @@ main {
     transition: background 0.2s;
 }
 
-.cabane {
-    width: 120px;
-    height: auto;
-    border-radius: 8px;
-    display: block;
-    margin: 10px auto;
-}
-
-.paris {
-    width: 120px;
-    height: auto;
-    border-radius: 8px;
-    display: block;
-    margin: 10px auto;
-}
-
-.saint-tropez {
-    width: 120px;
-    height: auto;
-    border-radius: 8px;
-    display: block;
-    margin: 10px auto;
-}
-
 .place-img {
-    width: 120px;
-    height: auto;
+    width: 500px;
+    height: 400px;
     object-fit: cover;
     display: block;
-    margin: 10px auto;
-    margin-bottom: 10px;
+    margin: 10px auto 10px auto;
+    border-radius: 8px;
 }
 
 .placedetails-img {
     display: block;
     margin: 20px auto;
-    width: 800px;
-    height: 500px;
+    width: 1200px;
+    height: 800px;
     object-fit: cover;
     border-radius: 12px;
 }
@@ -127,3 +105,4 @@ footer {
     padding: 1rem 0;
     font-size: 1rem;
 }
+
