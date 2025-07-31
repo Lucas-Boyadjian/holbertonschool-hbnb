@@ -14,7 +14,7 @@
 body {
     background-color: #f4f4f4;
     color: #333;
-    font-size: 20px;
+    font-size: 28px;
 }
 
 header {
@@ -46,6 +46,30 @@ nav a {
     
 }
 
+#price-filter {
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    border: 1px solid #faae16;
+    background: #fffbe8;
+    color: #333;
+    font-size: 1.1rem;
+    font-family: inherit;
+    box-shadow: 0 2px 8px rgba(250, 174, 22, 0.08);
+    transition: border-color 0.2s;
+    outline: none;
+}
+
+#price-filter:focus {
+    border-color: #e09e0b;
+}
+
+#filter label {
+    margin-right: 0.7rem;
+    font-weight: bold;
+    color: #000000;
+}
+
+
 nav a:active {
     background: #e09e0b;
     transform: scale(0.97);
@@ -56,6 +80,66 @@ main {
     margin-bottom: 80px
 }
 
+.login-box {
+    background: #fffbe8;
+    border: 1px solid #faae16;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(250, 174, 22, 0.18);
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 320px;
+}
+
+.login-box h2 {
+    margin-bottom: 2rem;
+    color: #faae16;
+    font-size: 2.2rem;
+    font-weight: bold;
+}
+
+.login-box label {
+    align-self: flex-start;
+    margin-bottom: 0.3rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    margin-bottom: 1.2rem;
+    border: 1px solid #faae16;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.login-box input:focus {
+    border-color: #e09e0b;
+}
+
+.login-box button {
+    background: #faae16;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 2rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(250, 174, 22, 0.08);
+    transition: background 0.15s, transform 0.1s;
+}
+
+.login-box button:active {
+    background: #e09e0b;
+    transform: scale(0.97);
+}
+
 .place-card {
     margin: 20px;
     padding: 10px;
@@ -63,6 +147,15 @@ main {
     border-radius: 10px;
     background: #ffe5be;
     text-align: center;
+    transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s, background 0.2s;
+}
+
+.place-card:hover {
+    box-shadow: 0 8px 24px rgba(250, 174, 22, 0.25), 0 2px 8px rgba(0,0,0,0.08);
+    border-color: #faae16;
+    background: #fffbe8;
+    transform: translateY(-4px) scale(1.03);
+    cursor: pointer;
 }
 
 .review-card {
