@@ -3,28 +3,46 @@
   You'll probably need to override some of theese styles.
 */
 
+@import url('https://fonts.googleapis.com/css?family=Quicksand:400,700&display=swap');
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Trebuchet MS', Verdana, Arial, sans-serif;
+    font-family: 'Quicksand', Verdana, Arial, sans-serif;
+}
+
+.logo {
+    width: 250px;
+    height: 100px;
+    object-fit: contain;
+}
+
+.icon {
+    width: 48px;
+    height: 48px;
+    vertical-align: middle;
+    margin-right: 10px;
 }
 
 body {
     background-color: #f4f4f4;
     color: #333;
-    font-size: 28px;
+    font-size: 40px;
 }
 
 header {
     background-color: #fdd193;
     color: #fff;
-    padding: 1rem;
+    padding: 0;
+    height: 140px;
+    display: flex;
+    align-items: center;
 }
 
 nav {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
 }
 
@@ -33,7 +51,7 @@ nav a {
     background: #faae16;
     text-decoration: none;
     margin: 0 1rem;
-    font-size: 2rem;
+    font-size: 3rem;
     padding: 0.5rem 1.5rem;
     border-radius: 8px;
     font-weight: bold;
@@ -45,14 +63,14 @@ nav a {
 }
 
 #price-filter {
-    padding: 0.5rem 1.2rem;
-    border-radius: 8px;
-    border: 1px solid #faae16;
+    padding: 0.7rem 1.6rem;
+    border-radius: 9px;
+    border: 1.5px solid #faae16;
     background: #fffbe8;
     color: #333;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     font-family: inherit;
-    box-shadow: 0 2px 8px rgba(250, 174, 22, 0.08);
+    box-shadow: 0 2px 8px rgba(250, 174, 22, 0.10);
     transition: border-color 0.2s;
     outline: none;
 }
@@ -62,9 +80,10 @@ nav a {
 }
 
 #filter label {
-    margin-right: 0.7rem;
+    margin-right: .7rem;
     font-weight: bold;
     color: #000000;
+    font-size: 2rem;
 }
 
 nav a:active {
@@ -97,7 +116,7 @@ body.login-page main {
     align-items: center;
     min-width: 400px;
     max-width: 650px;
-    min-height: 80px;
+    min-height: 700px;
     width: 100%;
     margin: 0 auto;
     position: absolute;
@@ -107,9 +126,9 @@ body.login-page main {
 }
 
 .login-box h2 {
-    margin-bottom: 2rem;
+    margin-bottom: 5rem;
     color: #faae16;
-    font-size: 3.2rem;
+    font-size: 5rem;
     font-weight: bold;
 }
 
@@ -118,6 +137,7 @@ body.login-page main {
     margin-bottom: 0.3rem;
     font-weight: bold;
     color: #333;
+    margin-top: 1.5rem;
 }
 
 .login-box input {
@@ -142,11 +162,12 @@ body.login-page main {
     border: none;
     border-radius: 8px;
     padding: 0.7rem 2rem;
-    font-size: 1.2rem;
+    font-size: 2rem;
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(250, 174, 22, 0.08);
     transition: background 0.15s, transform 0.1s;
+    margin-top: 2.5rem;
 }
 
 .login-box button:active {
@@ -161,6 +182,9 @@ body.login-page main {
     border-radius: 10px;
     background: #ffe5be;
     text-align: center;
+    max-width: 900px;
+    width: 100%;
+    min-height: 800px;
     transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s, background 0.2s;
 }
 
@@ -184,7 +208,9 @@ body.login-page main {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
+    align-items: center;
+    min-height: 70vh;
+    gap: 90px;
 }
 
 #filter {
@@ -203,10 +229,11 @@ body.login-page main {
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     box-shadow: 0 2px 8px rgba(250, 174, 22, 0.08);
     transition: background 0.15s, transform 0.1s;
     display: inline-block;
+    margin-top: 2.5rem;
 }
 
 .details-button:active {
@@ -215,8 +242,8 @@ body.login-page main {
 }
 
 .place-img {
-    width: 500px;
-    height: 400px;
+    width: 800px;
+    height: 500px;
     object-fit: cover;
     display: block;
     margin: 10px auto 10px auto;
