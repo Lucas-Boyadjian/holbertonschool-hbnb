@@ -25,29 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handles price filter changes and updates displayed places accordingly.
         document.getElementById('price-filter').addEventListener('change', (event) => {
             const selectedPrice = event.target.value;
-            const token = getCookie('token');
-
-            if (!token) {
-                const cards = document.querySelectorAll('.place-card');
-                cards.forEach(card => {
-                    const priceText = card.querySelector('p').textContent;
-                    const match = priceText.match(/(\d+)/);
-                    const price = match ? parseFloat(match[1]) : 0;
-                    if (selectedPrice === "All" || price <= Number(selectedPrice)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
+            
+            // Always use dynamic filtering with allPlaces array
+            let filteredPlaces;
+            if (selectedPrice === "All") {
+                filteredPlaces = allPlaces;
             } else {
-                let filteredPlaces;
-                if (selectedPrice === "All") {
-                    filteredPlaces = allPlaces;
-                } else {
-                    filteredPlaces = allPlaces.filter(place => Number(place.price) <= Number(selectedPrice));
-                }
-                displayPlaces(filteredPlaces);
+                filteredPlaces = allPlaces.filter(place => Number(place.price) <= Number(selectedPrice));
             }
+            displayPlaces(filteredPlaces);
         });
     }
     // Handles login form submission and calls loginUser.
@@ -118,6 +104,8 @@ function checkAuthentication() {
         if (!homeLogin) {
             alert('You must be logged in to access this page.');
             window.location.href = 'index.html';
+        } else {
+            fetchPlaces(null);
         }
         
     } else {
@@ -130,82 +118,73 @@ function checkAuthentication() {
         // Fetch places if the user is authenticated.
         fetchPlaces(token);
     }
-    console.log('checkAuthentication() token:', token);
     return token;
 }
 
 
 // Fetches all places from the API and displays them.
 async function fetchPlaces(token) {
-    try {
-        const response = await fetch('http://127.0.0.1:5000/api/v1/places/', {
-            method: 'GET',
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const result = await handleApiResponse(response);
-        
-        if (result.error) {
-            alert('Failed to fetch places: ' + result.error);
-        } else {
-            allPlaces = result.places || result;
-            displayPlaces(result.places || result);
-        }
-    } catch (error) {
-        alert('Network error while fetching places. Please try again.');
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const response = await fetch('http://127.0.0.1:5000/api/v1/places/', {
+        method: 'GET',
+        headers: headers
+    });
+    
+    const result = await handleApiResponse(response);
+    
+    if (result.error) {
+        alert('Failed to fetch places: ' + result.error);
+    } else {
+        allPlaces = result.places || result;
+        displayPlaces(result.places || result);
     }
 }
 
 
 // Fetches the details of a specific place and displays them.
 async function fetchPlaceDetails(token, placeId) {
-    try {
-        const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const result = await handleApiResponse(response);
-        
-        if (result.error) {
-            alert('Failed to fetch place details: ' + result.error);
-        } else {
-            displayPlaceDetails(result);
+    const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
         }
-    } catch (error) {
-        alert('Network error while fetching place details. Please try again.');
+    });
+    
+    const result = await handleApiResponse(response);
+    
+    if (result.error) {
+        alert('Failed to fetch place details: ' + result.error);
+    } else {
+        displayPlaceDetails(result);
     }
 }
 
 
 // Sends a POST request to submit a new review for a place.
 async function submitReview(token, placeId, reviewText) {
-    try {
-        const reviewRating = document.getElementById('rating').value;
-        const response = await fetch('http://127.0.0.1:5000/api/v1/reviews/', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                place_id: placeId,
-                text: reviewText,
-                rating: Number(reviewRating)
-            })
-        });
-        
-        return await handleApiResponse(response);
-    } catch (error) {
-        console.error(error);
-        return { error: 'Network error. Please try again.' };
-    }
+    const reviewRating = document.getElementById('rating').value;
+    const response = await fetch('http://127.0.0.1:5000/api/v1/reviews/', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            place_id: placeId,
+            text: reviewText,
+            rating: Number(reviewRating)
+        })
+    });
+    
+    return await handleApiResponse(response);
 }
 
 
@@ -268,7 +247,6 @@ function displayPlaceDetails(place) {
 
     const reviewDetails = document.getElementById('reviews');
     if (reviewDetails) {
-        reviewDetails.innerHTML = '';
         reviewDetails.innerHTML = '<h2>Reviews</h2>';
         if (place.reviews && place.reviews.length > 0) {
             place.reviews.forEach(review => {
@@ -281,8 +259,6 @@ function displayPlaceDetails(place) {
                 `;
                 reviewDetails.appendChild(placeReviewDiv);
             });
-        } else {
-            reviewDetails.innerHTML = '<p>No reviews yet.</p>';
         }
     }
 }
@@ -293,12 +269,8 @@ async function handleApiResponse(response) {
     if (response.ok) {
         return await response.json();
     } else {
-        try {
-            const errorData = await response.json();
-            return { error: errorData.error || `HTTP ${response.status}: ${response.statusText}` };
-        } catch (e) {
-            return { error: `HTTP ${response.status}: ${response.statusText}` };
-        }
+        const errorData = await response.json();
+        return { error: errorData.error || `HTTP ${response.status}: ${response.statusText}` };
     }
 }
 
