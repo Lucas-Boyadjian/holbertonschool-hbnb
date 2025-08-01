@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('price-filter').addEventListener('change', (event) => {
             const selectedPrice = event.target.value;
             
-            // Always use dynamic filtering with allPlaces array
             let filteredPlaces;
             if (selectedPrice === "All") {
                 filteredPlaces = allPlaces;
@@ -63,27 +62,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Sends a POST request to log in the user and stores the token in a cookie.
 async function loginUser(email, password) {
-    try {
-        const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
-        
-        const result = await handleApiResponse(response);
-        
-        if (result.error) {
-            alert('Login failed: ' + result.error);
-        } else {
-            document.cookie = `token=${result.access_token}; path=/`;
-            authToken = result.access_token;
-            alert('Login successful! Welcome!');
-            window.location.href = 'index.html';
-        }
-    } catch (error) {
-        alert('Network error. Please try again.');
+    const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+    });
+    
+    const result = await handleApiResponse(response);
+    
+    if (result.error) {
+        alert('Login failed: ' + result.error);
+    } else {
+        document.cookie = `token=${result.access_token}; path=/`;
+        authToken = result.access_token;
+        alert('Login successful! Welcome!');
+        window.location.href = 'index.html';
     }
 }
 
