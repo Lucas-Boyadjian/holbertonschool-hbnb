@@ -36,45 +36,6 @@ The application serves as the primary user interface for the HBNB platform, conn
 - **Cross-Device Compatibility:** Consistent experience across all devices
 - **Performance Optimization:** Efficient CSS and JavaScript
 
-## Project Architecture
-
-```
-Frontend (Part 4)
-├── User Interface Layer
-│   ├── HTML Templates
-│   ├── CSS Styling
-│   └── JavaScript Logic
-├── API Communication Layer
-│   ├── Authentication Service
-│   ├── Places Service
-│   └── Reviews Service
-└── Data Management Layer
-    ├── Cookie Management
-    ├── State Management
-    └── Error Handling
-```
-
-## File Structure
-
-```
-part4/base_files/
-├── index.html              # Home page - property listings
-├── place.html              # Property details page
-├── login.html              # User authentication page
-├── add_review.html         # Review submission form
-├── styles.css              # Main stylesheet (organized by sections)
-├── scripts.js              # Core JavaScript functionality
-├── README.md               # Project documentation
-└── images/                 # Static assets
-    ├── logo.png            # Application logo
-    ├── icon.png            # Favicon
-    ├── cabane.png          # Sample property image
-    ├── paris.png           # Sample property image
-    ├── saint-tropez.png    # Sample property image
-    ├── icon_wifi.png       # Amenity icon
-    ├── icon_bed.png        # Amenity icon
-    └── icon_bath.png       # Amenity icon
-```
 
 ## Technologies Used
 
@@ -95,39 +56,6 @@ part4/base_files/
 - **Cookie Management:** Secure authentication token storage
 - **Error Handling:** Comprehensive error management system
 - **Form Validation:** Client-side input validation
-
-## Installation & Setup
-
-### Prerequisites
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Web server (Apache, Nginx, or development server)
-- HBNB Backend API (Parts 1-3) running and accessible
-
-### Quick Start
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Lucas-Boyadjian/holbertonschool-hbnb.git
-   cd holbertonschool-hbnb/part4/base_files
-   ```
-
-2. **Configure API endpoints:**
-   - Update API URLs in `scripts.js` if necessary
-   - Ensure backend API is running on expected port
-
-3. **Serve the application:**
-   ```bash
-   # Using Python
-   python3 -m http.server 8000
-   
-   # Using Node.js
-   npx serve .
-   
-   # Using PHP
-   php -S localhost:8000
-   ```
-
-4. **Access the application:**
-   - Open browser and navigate to `http://localhost:8000`
 
 ## Usage Guide
 
