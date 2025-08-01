@@ -1,28 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-    
+<!-- 
+Main page of the HBNB application displaying available places for rent.
+Features include place filtering by price, authentication-based access,
+and dynamic content loading from the API.
+-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>List of Places</title>
     <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+</head><body>
+    <!-- Header with navigation -->
     <header>
-        <img src="images/logo.png" alt="logo" class="logo">
+        <a href="index.html">
+            <img src="images/logo.png" alt="logo" class="logo">
+        </a>
         <nav>
             <a href="index.html" class="nav-home">Home</a>
             <a href="login.html" id="login-link" class="login-button">Login</a>
         </nav>
     </header>
+    
+    <!-- Main content with places listing -->
     <main>
+        <!-- Price filter section -->
         <section id="filter">
             <label for="price-filter"><strong>Max Price:</strong></label>
             <select id="price-filter">
                 <!-- Options will be populated dynamically -->
             </select>
         </section>
+        
+        <!-- Places listing section -->
         <section id="places-list">
+            <!-- Sample places for initial display -->
             <div class="place-card">
                 <h2><img src="images/icon.png" alt="icon" class="icon">Apartment in Paris</h2>
                 <img src="images/paris.png" alt="paris" class="place-img">
@@ -44,9 +56,14 @@
             <!-- List of places will be populated dynamically -->
         </section>
     </main>
+    
+    <!-- Footer -->
     <footer>
         &copy; 2025 HBnB Evolution. All rights reserved.
     </footer>
+    
+    <!-- JavaScript for dynamic functionality -->
     <script src="scripts.js"></script>
 </body>
+
 </html>

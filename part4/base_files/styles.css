@@ -12,21 +12,6 @@
     font-family: 'Quicksand', Verdana, Arial, sans-serif;
 }
 
-.logo {
-    width: clamp(120px, 15vw, 250px);
-    height: auto;
-    aspect-ratio: 2.5/1;
-    object-fit: contain;
-}
-
-.icon {
-    width: clamp(24px, 3vw, 48px);
-    height: auto;
-    aspect-ratio: 1/1;
-    vertical-align: middle;
-    margin-right: 1vw;
-}
-
 body {
     background-color: #f4f4f4;
     color: #333;
@@ -67,32 +52,6 @@ nav a {
     white-space: nowrap;
 }
 
-#price-filter {
-    padding: clamp(0.5rem, 1.2vw, 0.8rem) clamp(0.8rem, 2vw, 1.5rem);
-    border-radius: 8px;
-    border: 2px solid #faae16;
-    background: #ffffff;
-    color: #333;
-    font-size: clamp(1.1rem, 2.2vw, 1.4rem);
-    font-family: inherit;
-    font-weight: bold;
-    box-shadow: 0 4px 12px rgba(250, 174, 22, 0.15);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
-}
-
-#price-filter:focus {
-    border-color: #e09e0b;
-    box-shadow: 0 6px 16px rgba(250, 174, 22, 0.25);
-}
-
-#filter label {
-    margin-right: 1vw;
-    font-weight: bold;
-    color: #faae16;
-    font-size: clamp(1.3rem, 2.5vw, 2rem);
-}
-
 nav a:active {
     background: #e09e0b;
     transform: scale(0.97);
@@ -110,6 +69,54 @@ main {
     max-width: 1400px;
     margin-left: auto;
     margin-right: auto;
+}
+
+footer {
+    width: 100%;
+    text-align: center;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    background: #fdd193;
+    color: #333;
+    padding: clamp(0.5rem, 1.5vw, 1rem) 0;
+    font-size: clamp(0.8rem, 1.2vw, 1rem);
+}
+
+.logo {
+    width: clamp(120px, 15vw, 250px);
+    height: auto;
+    aspect-ratio: 2.5/1;
+    object-fit: contain;
+}
+
+.icon {
+    width: clamp(24px, 3vw, 48px);
+    height: auto;
+    aspect-ratio: 1/1;
+    vertical-align: middle;
+    margin-right: 1vw;
+}
+
+.details-button {
+    background-color: #faae16;
+    color: #fff;
+    border: none;
+    padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(0.6rem, 1.5vw, 1rem);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+    box-shadow: 0 2px 8px rgba(250, 174, 22, 0.08);
+    transition: background 0.15s, transform 0.1s;
+    display: inline-block;
+    margin-top: clamp(1rem, 2vw, 2rem);
+    align-self: center;
+}
+
+.details-button:active {
+    background: #e09e0b;
+    transform: scale(0.97);
 }
 
 body.login-page main {
@@ -193,6 +200,54 @@ body.login-page main {
     transform: scale(0.97);
 }
 
+#filter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: clamp(15px, 2.5vw, 25px);
+    gap: clamp(8px, 1.5vw, 15px);
+    padding: 0 2vw;
+    flex-wrap: wrap;
+}
+
+#filter label {
+    margin-right: 1vw;
+    font-weight: bold;
+    color: #faae16;
+    font-size: clamp(1.3rem, 2.5vw, 2rem);
+}
+
+#price-filter {
+    padding: clamp(0.5rem, 1.2vw, 0.8rem) clamp(0.8rem, 2vw, 1.5rem);
+    border-radius: 8px;
+    border: 2px solid #faae16;
+    background: #ffffff;
+    color: #333;
+    font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+    font-family: inherit;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(250, 174, 22, 0.15);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+#price-filter:focus {
+    border-color: #e09e0b;
+    box-shadow: 0 6px 16px rgba(250, 174, 22, 0.25);
+}
+
+#places-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    min-height: 60vh;
+    gap: clamp(3px, 0.4vw, 8px);
+    padding: 0 0.2vw;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
 .place-card {
     margin: 0;
     padding: clamp(15px, 2vw, 25px);
@@ -230,59 +285,6 @@ body.login-page main {
     font-size: clamp(1.3rem, 2.5vw, 2rem);
 }
 
-.review-card {
-    margin: clamp(10px, 1.5vw, 20px);
-    padding: clamp(8px, 1.2vw, 15px);
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background: #ffe5be;
-    max-width: clamp(250px, 60vw, 500px);
-    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
-}
-
-#places-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: stretch;
-    min-height: 60vh;
-    gap: clamp(3px, 0.4vw, 8px);
-    padding: 0 0.2vw;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-#filter {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: clamp(15px, 2.5vw, 25px);
-    gap: clamp(8px, 1.5vw, 15px);
-    padding: 0 2vw;
-    flex-wrap: wrap;
-}
-
-.details-button {
-    background-color: #faae16;
-    color: #fff;
-    border: none;
-    padding: clamp(0.3rem, 0.8vw, 0.6rem) clamp(0.6rem, 1.5vw, 1rem);
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
-    box-shadow: 0 2px 8px rgba(250, 174, 22, 0.08);
-    transition: background 0.15s, transform 0.1s;
-    display: inline-block;
-    margin-top: clamp(1rem, 2vw, 2rem);
-    align-self: center;
-}
-
-.details-button:active {
-    background: #e09e0b;
-    transform: scale(0.97);
-}
-
 .place-img {
     width: 100%;
     height: 300px;
@@ -292,42 +294,12 @@ body.login-page main {
     border-radius: 8px;
 }
 
-.placedetails-img {
-    display: block;
-    margin: clamp(10px, 2vw, 20px) auto;
-    width: 90vw;
-    max-width: clamp(400px, 80vw, 800px);
-    height: auto;
-    aspect-ratio: 16/10;
-    object-fit: cover;
-    border-radius: 12px;
-}
-
-footer {
-    width: 100%;
-    text-align: center;
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    background: #fdd193;
-    color: #333;
-    padding: clamp(0.5rem, 1.5vw, 1rem) 0;
-    font-size: clamp(0.8rem, 1.2vw, 1rem);
-}
-
 .place-details {
     display: flex;
     flex-direction: column;
     gap: clamp(20px, 3vw, 30px);
     flex: none;
     padding: clamp(20px, 3vw, 40px);
-}
-
-.reviews-column {
-    flex: none;
-    display: flex;
-    flex-direction: row;
-    gap: clamp(20px, 3vw, 30px);
 }
 
 .place-info {
@@ -360,6 +332,24 @@ footer {
     font-weight: bold;
 }
 
+.placedetails-img {
+    display: block;
+    margin: clamp(10px, 2vw, 20px) auto;
+    width: 90vw;
+    max-width: clamp(400px, 80vw, 800px);
+    height: auto;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.reviews-column {
+    flex: none;
+    display: flex;
+    flex-direction: row;
+    gap: clamp(20px, 3vw, 30px);
+}
+
 #reviews {
     padding: 0;
     margin: 0;
@@ -372,6 +362,16 @@ footer {
     font-weight: bold;
     text-align: center;
     margin-bottom: clamp(20px, 3vw, 30px);
+}
+
+.review-card {
+    margin: clamp(10px, 1.5vw, 20px);
+    padding: clamp(8px, 1.2vw, 15px);
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #ffe5be;
+    max-width: clamp(250px, 60vw, 500px);
+    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
 }
 
 .add-review {
@@ -450,4 +450,3 @@ footer {
     min-width: 0;
     flex: 2;
 }
-

@@ -1,11 +1,17 @@
 /* 
-  This is a SAMPLE FILE to get you started.
-  Please, follow the project instructions to complete the tasks.
+This file contains the main JavaScript logic for the HBNB (Holberton AirBnB) 
+frontend application. It handles user authentication, place management, 
+reviews, and API communication with the Flask backend.
 */
 
-let authToken = null;
 
-// Handles DOMContentLoaded event and sets up event listeners for filters, login, and review form.
+let authToken = null;
+let allPlaces = [];
+
+/*
+Handles DOMContentLoaded event and sets up event listeners 
+for filters, login, and review form.
+*/
 document.addEventListener('DOMContentLoaded', () => {
     checkAuthentication()
     const priceFilter = document.getElementById('price-filter');
@@ -56,17 +62,127 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Handles review form submission and calls submitReview.
     const reviewForm = document.getElementById('review-form');
-    const token = checkAuthentication();
-    const placeId = getPlaceIdFromURL();
     if (reviewForm) {
         reviewForm.addEventListener('submit', async (event) => {
             event.preventDefault();
+            const token = getCookie('token');
+            const placeId = getPlaceIdFromURL();
             const reviewText = document.getElementById('review-text').value;
             const result = await submitReview(token, placeId, reviewText);
             handleReviewResponse(result, reviewForm);
         });
     }
 });
+
+
+// Sends a POST request to log in the user and stores the token in a cookie.
+async function loginUser(email, password) {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const result = await handleApiResponse(response);
+        
+        if (result.error) {
+            alert('Login failed: ' + result.error);
+        } else {
+            document.cookie = `token=${result.access_token}; path=/`;
+            authToken = result.access_token;
+            alert('Login successful! Welcome!');
+            window.location.href = 'index.html';
+        }
+    } catch (error) {
+        alert('Network error. Please try again.');
+    }
+}
+
+
+// Checks if the user is authenticated and updates UI accordingly.
+function checkAuthentication() {
+    const token = getCookie('token');
+    authToken = token;
+    const loginLink = document.getElementById('login-link');
+    const addReviewSection = document.getElementById('add-review');
+    const placeId = getPlaceIdFromURL();
+    const path = window.location.pathname;
+    const homeLogin = path.endsWith('index.html') || document.getElementById('login-form');
+
+    if (!token) {
+        if (loginLink) loginLink.style.display = 'block';
+        if (addReviewSection) addReviewSection.style.display = 'none';
+        if (!homeLogin) {
+            alert('You must be logged in to access this page.');
+            window.location.href = 'index.html';
+        }
+        
+    } else {
+        if (loginLink) loginLink.style.display = 'none';
+        if (addReviewSection) {
+            addReviewSection.style.display = 'block';
+            // Fetches place details if authenticated.
+            fetchPlaceDetails(token, placeId);
+        }
+        // Fetch places if the user is authenticated.
+        fetchPlaces(token);
+    }
+    console.log('checkAuthentication() token:', token);
+    return token;
+}
+
+
+// Fetches all places from the API and displays them.
+async function fetchPlaces(token) {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/api/v1/places/', {
+            method: 'GET',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await handleApiResponse(response);
+        
+        if (result.error) {
+            alert('Failed to fetch places: ' + result.error);
+        } else {
+            allPlaces = result.places || result;
+            displayPlaces(result.places || result);
+        }
+    } catch (error) {
+        alert('Network error while fetching places. Please try again.');
+    }
+}
+
+
+// Fetches the details of a specific place and displays them.
+async function fetchPlaceDetails(token, placeId) {
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await handleApiResponse(response);
+        
+        if (result.error) {
+            alert('Failed to fetch place details: ' + result.error);
+        } else {
+            displayPlaceDetails(result);
+        }
+    } catch (error) {
+        alert('Network error while fetching place details. Please try again.');
+    }
+}
+
 
 // Sends a POST request to submit a new review for a place.
 async function submitReview(token, placeId, reviewText) {
@@ -84,97 +200,29 @@ async function submitReview(token, placeId, reviewText) {
                 rating: Number(reviewRating)
             })
         });
-        if (response.ok) {
-            return await response.json();
-        } else {
-            throw new Error('Error submitting the review.');
-        }
+        
+        return await handleApiResponse(response);
     } catch (error) {
         console.error(error);
-        return null;
+        return { error: 'Network error. Please try again.' };
     }
 }
 
-// Sends a POST request to log in the user and stores the token in a cookie.
-async function loginUser(email, password) {
-    const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
-        method: 'POST',
-        headers: {
-                    'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-    });
-    // Handles the login response and redirects on success.
-    if (response.ok) {
-        const data = await response.json();
-        document.cookie = `token=${data.access_token}; path=/`;
-        authToken = data.access_token;
-        window.location.href = 'index.html';
+
+// Handles the response after submitting a review and refreshes the place details
+function handleReviewResponse(result, reviewForm) {
+    if (result && !result.error) {
+        alert('Review submitted successfully!');
+        reviewForm.reset();
+        const token = getCookie('token');
+        const placeId = getPlaceIdFromURL();
+        fetchPlaceDetails(token, placeId);
     } else {
-        alert('Login failed: ' + response.statusText);
+        const errorMessage = result?.error || 'Failed to submit review.';
+        alert(errorMessage);
     }
 }
 
-// Checks if the user is authenticated and updates UI accordingly.
-function checkAuthentication() {
-    const token = getCookie('token');
-    authToken = token;
-    const loginLink = document.getElementById('login-link');
-    const addReviewSection = document.getElementById('add-review');
-    const placeId = getPlaceIdFromURL();
-    const path = window.location.pathname;
-    const homeLogin = path.endsWith('index.html') || document.getElementById('login-form');
-
-    if (!token) {
-        if (loginLink) loginLink.style.display = 'block';
-        if (addReviewSection) addReviewSection.style.display = 'none';
-        if (!homeLogin) window.location.href = 'index.html';
-        
-    } else {
-        if (loginLink) loginLink.style.display = 'none';
-        if (addReviewSection) {
-            addReviewSection.style.display = 'block';
-            // Fetches place details if authenticated.
-            fetchPlaceDetails(token, placeId);
-        }
-        // Fetch places if the user is authenticated.
-        fetchPlaces(token);
-    }
-    console.log('checkAuthentication() token:', token);
-    return token;
-}
-
-// Retrieves a cookie value by its name.
-function getCookie(name) {
-    const cookies = document.cookie.split('; ');
-    for (const cookie of cookies) {
-        const [key, value] = cookie.split('=');
-        if (key === name) {
-            return decodeURIComponent(value);
-        }
-    }
-    return null;
-}
-
-// Fetches all places from the API and displays them.
-async function fetchPlaces(token) {
-    const response = await fetch('http://127.0.0.1:5000/api/v1/places/', {
-        method: 'GET',
-        headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    if (response.ok) {
-        const data = await response.json();
-        allPlaces = data.places || data;
-        displayPlaces(data.places || data);
-    } else {
-        alert('Failed to fetch places');
-    }
-}
-
-let allPlaces = [];
 
 // Displays the list of places on the page.
 function displayPlaces(places) {
@@ -196,28 +244,6 @@ function displayPlaces(places) {
     });
 }
 
-// Extracts the place ID from the URL query parameters.
-function getPlaceIdFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('id');
-}
-
-// Fetches the details of a specific place and displays them.
-async function fetchPlaceDetails(token, placeId) {
-    const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    if (response.ok) {
-        const data = await response.json();
-        displayPlaceDetails(data);
-    } else {
-        alert('Failed to fetch place details');
-    }
-}
 
 // Displays the details of a place, including its reviews.
 function displayPlaceDetails(place) {
@@ -261,15 +287,37 @@ function displayPlaceDetails(place) {
     }
 }
 
-// Handles the response after submitting a review and refreshes the place details
-function handleReviewResponse(result, reviewForm) {
-    if (result) {
-        alert('Review submitted successfully!');
-        reviewForm.reset();
-        const token = getCookie('token');
-        const placeId = getPlaceIdFromURL();
-        fetchPlaceDetails(token, placeId);
+
+// Generic function to handle API responses and extract error messages.
+async function handleApiResponse(response) {
+    if (response.ok) {
+        return await response.json();
     } else {
-        alert('Failed to submit review.');
+        try {
+            const errorData = await response.json();
+            return { error: errorData.error || `HTTP ${response.status}: ${response.statusText}` };
+        } catch (e) {
+            return { error: `HTTP ${response.status}: ${response.statusText}` };
+        }
     }
+}
+
+
+// Retrieves a cookie value by its name.
+function getCookie(name) {
+    const cookies = document.cookie.split('; ');
+    for (const cookie of cookies) {
+        const [key, value] = cookie.split('=');
+        if (key === name) {
+            return decodeURIComponent(value);
+        }
+    }
+    return null;
+}
+
+
+// Extracts the place ID from the URL query parameters.
+function getPlaceIdFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id');
 }
