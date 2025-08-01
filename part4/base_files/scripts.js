@@ -230,8 +230,8 @@ function displayPlaceDetails(place) {
     const placeDetailsDiv = document.createElement('div');
     placeDetailsDiv.className = 'place-info';
     placeDetailsDiv.innerHTML = `
-        <img src="${place.image || 'images/icon.png'}" alt="place image" class="placedetails-img">
         <h2>${place.title}</h2>
+        <img src="${place.image || 'images/icon.png'}" alt="place image" class="placedetails-img">
         <p><strong>Host:</strong> ${place.owner.first_name} ${place.owner.last_name}</p>
         <p><strong>Location:</strong> Latitude: ${place.latitude} | Longitude: ${place.longitude}</p>
         <p><strong>Description:</strong> ${place.description}</p>
